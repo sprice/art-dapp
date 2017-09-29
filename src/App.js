@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
 
 import './css/oswald.css'
@@ -12,8 +12,20 @@ class App extends Component {
     super(props)
 
     this.state = {
-      storageValue: 0,
-      web3: null
+      web3: null,
+      curator: '',
+      owner: '',
+      artThumbHash: '',
+      artHash: '',
+      listingPrice: 0,
+      title: '',
+      artistName: '',
+      artist: '',
+      createdYear: '',
+      forSaleDate: '',
+      forSale: false,
+      artistHasSigned: false,
+      ipfsBase: '//ipfs.io/ipfs/'
     }
   }
 
@@ -44,45 +56,76 @@ class App extends Component {
      */
 
     const contract = require('truffle-contract')
-    const simpleStorage = contract(SimpleStorageContract)
-    simpleStorage.setProvider(this.state.web3.currentProvider)
+    const digitalArtWork = contract(DigitalArtWork)
+    digitalArtWork.setProvider(this.state.web3.currentProvider)
 
     // Declaring this for later so we can chain functions on SimpleStorage.
-    var simpleStorageInstance
+    var digitalArtWorkInstance
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      simpleStorage.deployed().then((instance) => {
-        simpleStorageInstance = instance
-
-        // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, {from: accounts[0]})
-      }).then((result) => {
-        // Get the value from the contract to prove it worked.
-        return simpleStorageInstance.get.call(accounts[0])
-      }).then((result) => {
-        // Update state with the result.
-        return this.setState({ storageValue: result.c[0] })
+      digitalArtWork.at('0x0912279429798e39540fceb92434549ac3b4a4bc').then((instance) => {
+        digitalArtWorkInstance = instance
+        return digitalArtWorkInstance.title.call()
+      }).then((title) => {
+        this.setState({title})
+        return digitalArtWorkInstance.artistName.call()
+      }).then((artistName) => {
+        this.setState({artistName})
+        return digitalArtWorkInstance.createdYear.call()
+      }).then((createdYear) => {
+        this.setState({createdYear: createdYear.toNumber()})
+        return digitalArtWorkInstance.artThumbHash.call()
+      }).then((artThumbHash) => {
+        this.setState({artThumbHash})
+        return digitalArtWorkInstance.forSale.call()
+      }).then((forSale) => {
+        console.log(forSale)
+        this.setState({forSale})
+        return digitalArtWorkInstance.artistHasSigned.call()
+      }).then((artistHasSigned) => {
+        this.setState({artistHasSigned})
       })
     })
   }
 
   render() {
+
+    const thumbnail = this.state.ipfsBase + this.state.artThumbHash
+
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+            <a href="#" className="pure-menu-heading pure-menu-link">Art Gallery</a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <h1>Good to Go!</h1>
-              <p>Your Truffle Box is installed and ready.</p>
-              <h2>Smart Contract Example</h2>
-              <p>If your contracts compiled and migrated successfully, below will show a stored value of 5 (by default).</p>
-              <p>Try changing the value stored on <strong>line 59</strong> of App.js.</p>
-              <p>The stored value is: {this.state.storageValue}</p>
+              <h1>{this.state.title}</h1>
+              <h4>{this.state.artistName}, {this.state.createdYear}</h4>
+              <div>
+                {this.state.artThumbHash
+                  ? <img src={thumbnail} alt={this.state.title} />
+                  : <span/>
+                }
+              </div>
+              <div>
+                <em>
+                  {this.state.forSale
+                    ? <span>This work is for sale</span>
+                    : <span>This work is not for sale</span>
+                  }
+                </em>
+              </div>
+              <div>
+                <em>
+                  {this.state.artistHasSigned
+                    ? <span>This work is signed by the artist</span>
+                    : <span>This work has not yet been signed by the artist</span>
+                  }
+                </em>
+              </div>
             </div>
           </div>
         </main>
