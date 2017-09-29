@@ -1,16 +1,14 @@
-var SimpleStorage = artifacts.require("./SimpleStorage.sol");
 var DigitalArtWork = artifacts.require("./DigitalArtWork.sol");
 
 module.exports = function(deployer) {
-    deployer.deploy(SimpleStorage);
 
     var a = {
-        artThumbHash: 'foo',
-        artHash: 'bar',
-        title: 'baz',
-        artistName: 'foobar',
-        createdYear: 2017,
-        artist: '0xe96b1792d7a6d8012d4f61a4b5e9974129759cea'
+        artThumbHash: 'QmVJi8akNp7qqdvPutGAumtUm4GRsPDrPjRzTAx2JozyJE',
+        artHash: 'QmbkQfD89eA3cb6pncUF6rUbrqrkgDSyP11b9RbKb1NYXj',
+        title: 'La Mort de Marat',
+        artistName: 'Jacques-Louis David',
+        createdYear: 1793,
+        artist: ''
     }
 
     deployer.deploy(DigitalArtWork,
