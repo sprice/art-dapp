@@ -3,8 +3,8 @@ pragma solidity 0.4.15;
 contract DigitalArtWork {
     address public curator;
     address public owner;
-    bytes32 public artThumbHash;
-    bytes32 public artHash;
+    string public artThumbHash;
+    string public artHash;
     uint32 public listingPrice;
     string public title;
     string public artistName;
@@ -12,7 +12,7 @@ contract DigitalArtWork {
     uint public createdYear;
     uint public forSaleDate;
     uint public curatorCurrentBalance = 0;
-    bool public forSale = true;
+    bool public forSale = false;
     bool public artistHasSigned = false;
     // The artist receives 85% of the initial sale amount
     // and 10% of every subsequent sale.
@@ -43,15 +43,15 @@ contract DigitalArtWork {
         _;
     }
 
-    function DigitalArtWork(bytes32 _artThumbHash,
-                            bytes32 _artHash,
+    function DigitalArtWork(string _artThumbHash,
+                            string _artHash,
                             string _title,
                             string _artistName,
                             uint _createdYear,
                             address _artist) {
 
-        if (_artThumbHash == 0) revert();
-        if (_artHash == 0) revert();
+        if (bytes(_artThumbHash).length == 0) revert();
+        if (bytes(_artHash).length == 0) revert();
         if (bytes(_title).length == 0) revert();
         if (bytes(_artistName).length == 0) revert();
         if (_createdYear == 0) revert();
@@ -122,6 +122,7 @@ contract DigitalArtWork {
     public returns (bool) {
         if (_listingPrice <= 0) revert();
         if (_forSaleDate == 0) revert();
+        if (artistHasSigned != true) revert();
 
         listingPrice = _listingPrice;
         forSaleDate = _forSaleDate;
