@@ -64,7 +64,8 @@ class App extends Component {
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      digitalArtWork.at('0x0912279429798e39540fceb92434549ac3b4a4bc').then((instance) => {
+      digitalArtWork.deployed().then((instance) => {
+      // digitalArtWork.at('0x0912279429798e39540fceb92434549ac3b4a4bc').then((instance) => {
         digitalArtWorkInstance = instance
         return digitalArtWorkInstance.title.call()
       }).then((title) => {
