@@ -71,3 +71,16 @@ img {
   width: 100%;
   max-width: 420px;
 }
+
+.navbar {
+  display: flex;
+}
+
+.nav-column {
+  flex-grow: 1;
+  color: #fff;
+}
+
+.nav-column.account {
+  text-align: right
+}
