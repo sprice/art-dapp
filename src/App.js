@@ -11,6 +11,7 @@ class App extends Component {
   constructor(props) {
     super(props)
 
+    this.updateState = this.updateState.bind(this)
     this.sign = this.sign.bind(this)
     this.listForSale = this.listForSale.bind(this)
     this.unlist = this.unlist.bind(this)
@@ -27,13 +28,14 @@ class App extends Component {
       title: '',
       artistName: '',
       artist: '',
-      createdYear: '',
-      forSaleDate: '',
+      createdYear: 0,
+      forSaleDate: 0,
       forSale: false,
       artistHasSigned: false,
       ipfsBase: '//ipfs.io/ipfs/',
       account: null,
-      instance: null
+      instance: null,
+      curatorCurrentBalance: 0
     }
   }
 
@@ -72,51 +74,43 @@ class App extends Component {
       if (accounts[0]) this.setState({account: accounts[0]})
       digitalArtWork.deployed().then((instance) => {
       // digitalArtWork.at('0x0912279429798e39540fceb92434549ac3b4a4bc').then((instance) => {
-        this.setState({instance})
-        return this.state.instance.title()
-      }).then((title) => {
-        this.setState({title})
-        return this.state.instance.artistName()
-      }).then((artistName) => {
-        this.setState({artistName})
-        return this.state.instance.createdYear()
-      }).then((createdYear) => {
-        this.setState({createdYear: createdYear.toNumber()})
-        return this.state.instance.artThumbHash()
-      }).then((artThumbHash) => {
-        this.setState({artThumbHash})
-        return this.state.instance.forSale(this.state.account)
-      }).then((forSale) => {
-        this.setState({forSale})
-        return this.state.instance.artistHasSigned(this.state.account)
-      }).then((artistHasSigned) => {
-        this.setState({artistHasSigned})
-        return this.state.instance.owner()
-      }).then((owner) => {
-        this.setState({owner})
-        return this.state.instance.artist()
-      }).then((artist) => {
-        this.setState({artist})
-        return this.state.instance.curator()
-      }).then((curator) => {
-        this.setState({curator})
-        return this.state.instance.listingPrice(this.state.account)
-      }).then((listingPrice) => {
-        this.setState({listingPrice: listingPrice.toNumber()})
-        return this.state.instance.forSaleDate(this.state.account)
-      }).then((forSaleDate) => {
-        this.setState({forSaleDate: forSaleDate.toNumber()})
+        return this.setState({instance})
+      }).then(() => {
+        this.updateState()
       })
     })
+  }
+
+  updateState() {
+    for (let i=0; i < DigitalArtWork.abi.length; i++) {
+      let instance = DigitalArtWork.abi[i]
+      let key = DigitalArtWork.abi[i].name
+      if (instance.constant === true &&
+          instance.inputs.length === 0 &&
+          instance.payable === false &&
+          instance.type === 'function') {
+            this.state.instance[key].call().then((value) => {
+              let inState = this.state.hasOwnProperty(key)
+              if (inState) {
+                let isBigNumber = typeof value === 'object' && typeof value.toNumber === 'function'
+
+                let newState = {}
+
+                if (isBigNumber) newState[key] = value.toNumber()
+                else newState[key] = value
+                console.log(newState)
+                this.setState(newState)
+              }
+            })
+      }
+    }
+    // Called before for loop finishes
   }
 
   sign(evt) {
     evt.preventDefault()
     this.state.instance.signWork({from: this.state.account}).then((tx) => {
-      return this.state.instance.artistHasSigned(this.state.account)
-    }).then((artistHasSigned) => {
-      console.log('artistHasSigned', artistHasSigned)
-      this.setState({artistHasSigned})
+      this.updateState()
     })
   }
 
@@ -125,40 +119,15 @@ class App extends Component {
     const ether = 2
     const amount = parseInt(this.state.web3.toWei(ether, 'ether'), 10)
     const date = parseInt(new Date().getTime() / 1000, 10)
-    console.log('sale amount', amount)
-    console.log('sale date', date)
     this.state.instance.listWorkForSale(amount, date, {from: this.state.account}).then((tx) => {
-      console.log('tx', tx)
-      return this.state.instance.forSale(this.state.account)
-    }).then((forSale) => {
-      this.setState({forSale})
-      return this.state.instance.listingPrice(this.state.account)
-    }).then((listingPrice) => {
-      console.log('listingprice raw', listingPrice)
-      console.log('listingprice', listingPrice.c[0])
-      console.log('num', listingPrice.toNumber())
-      this.setState({listingPrice: listingPrice.toNumber()})
-      return this.state.instance.forSaleDate(this.state.account)
-    }).then((forSaleDate) => {
-      console.log('forSaleDate raw', forSaleDate)
-      console.log('forSaleDate', forSaleDate.c[0])
-      console.log('num', forSaleDate.toNumber())
-      this.setState({forSaleDate: forSaleDate.toNumber()})
+      this.updateState()
     })
   }
 
   unlist(evt) {
     evt.preventDefault()
     this.state.instance.delistWorkForSale({from: this.state.account}).then((tx) => {
-      return this.state.instance.forSale(this.state.account)
-    }).then((forSale) => {
-      this.setState({forSale})
-      return this.state.instance.listingPrice(this.state.account)
-    }).then((listingPrice) => {
-      this.setState({listingPrice: listingPrice.toNumber()})
-      return this.state.instance.forSaleDate(this.state.account)
-    }).then((forSaleDate) => {
-      this.setState({forSaleDate: forSaleDate.toNumber()})
+      this.updateState()
     })
   }
 
@@ -170,10 +139,7 @@ class App extends Component {
       from: this.state.account,
       value
     }).then((tx) => {
-      return this.state.instance.owner(this.state.account)
-    }).then((owner) => {
-      console.log('new owner', owner)
-      this.setState({owner})
+      this.updateState()
     })
   }
 
@@ -182,7 +148,7 @@ class App extends Component {
     const ether = 0.3
     const value = this.state.web3.toWei(ether, 'ether');
     this.state.instance.withdraw(value, {from: this.state.account}).then((tx) => {
-      console.log('withdraw tx', tx)
+      this.updateState()
     })
   }
 
@@ -201,8 +167,8 @@ class App extends Component {
     if (isOwner && isCurator) identity = 'You are the curator & owner'
     if (isArtist && isOwner && isCurator) identity = 'You are the curator & artist & owner'
 
-    // let saleAmount = ''
-    // if (this.state.web3) saleAmount = this.state.web3.fromWei(this.state.listingPrice, 'ether')
+    let saleAmount = ''
+    if (this.state.web3) saleAmount = this.state.web3.fromWei(this.state.listingPrice, 'ether')
 
     return (
       <div className="App">
@@ -234,10 +200,10 @@ class App extends Component {
               </div>
               <div>
                 <em>
-                  <div>The listing price is {this.state.listingPrice}</div>
+                  <div>The listing price is {saleAmount} ETH</div>
                   <div>Sale Date {this.state.forSaleDate}</div>
                   {this.state.forSale
-                    ? <span>This work is for sale: {this.state.listingPrice}</span>
+                    ? <span>This work is for sale: {saleAmount} ETH</span>
                     : <span>This work is not for sale</span>
                   }
                 </em>
