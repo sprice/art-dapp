@@ -41,4 +41,4 @@ $ npm run migrate
 ### Dev Gotchas
 
 * Sometimes the actions (sign, list, unlist, buy, withdraw) do not return expected output in promises (see current logging). Page refreshes usually help.
-* When restarting `testrpc` connect to a different network and then back to the local network. If you don't do this weird things can happen.
+* When restarting `testrpc` connect Metamask to a different network and then back to the local network. If you don't do this weird things can happen.
