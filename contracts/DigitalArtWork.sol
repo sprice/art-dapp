@@ -5,15 +5,15 @@ contract DigitalArtWork {
     address public owner;
     string public artThumbHash;
     string public artHash;
-    uint32 public listingPrice;
+    uint256 public listingPrice;
     string public title;
     string public artistName;
     address public artist;
     uint public createdYear;
     uint public forSaleDate;
-    uint public curatorCurrentBalance = 0;
-    bool public forSale = false;
-    bool public artistHasSigned = false;
+    uint public curatorCurrentBalance;
+    bool public forSale;
+    bool public artistHasSigned;
     // The artist receives 85% of the initial sale amount
     // and 10% of every subsequent sale.
     // The contract owner receives 15% of every sale amount
@@ -62,6 +62,9 @@ contract DigitalArtWork {
         title = _title;
         artistName = _artistName;
         createdYear = _createdYear;
+        artistHasSigned = false;
+        forSale = false;
+        curatorCurrentBalance = 0;
 
         // Set the artist
         artist = _artist;
@@ -79,7 +82,7 @@ contract DigitalArtWork {
         if (forSale != true) revert();
         if (artistHasSigned != true) revert();
         if (msg.value != listingPrice) revert();
-        if (forSaleDate < now) revert();
+        if (forSaleDate > now) revert();
 
         // @TODO: deal with possible decimals?
         uint256 artistAmount = msg.value / 100 * artistShare;
@@ -99,9 +102,10 @@ contract DigitalArtWork {
         // Artwork is no longer for sale
         forSale = false;
         forSaleDate = 0;
+        listingPrice = 0;
 
         // Track curator balance
-        curatorCurrentBalance = curatorCurrentBalance + curatorAmount;
+        curatorCurrentBalance += curatorAmount;
 
         // Change ownership
         owner = msg.sender;
@@ -117,11 +121,11 @@ contract DigitalArtWork {
         return true;
     }
 
-    function listWorkForSale(uint32 _listingPrice, uint _forSaleDate)
+    function listWorkForSale(uint256 _listingPrice, uint _forSaleDate)
     onlyOwner()
     public returns (bool) {
         if (_listingPrice <= 0) revert();
-        if (_forSaleDate == 0) revert();
+        if (_forSaleDate <= 0) revert();
         if (artistHasSigned != true) revert();
 
         listingPrice = _listingPrice;
@@ -134,9 +138,11 @@ contract DigitalArtWork {
     function delistWorkForSale() 
     onlyOwner()
     public returns (bool) {
+        if (forSale != true) revert();
 
         forSale = false;
         forSaleDate = 0;
+        listingPrice = 0;
 
         return forSale;
     }
@@ -152,9 +158,9 @@ contract DigitalArtWork {
     }
 
     // Allow the contract owner to withdraw value
-    function withdraw(uint32 amount) 
+    function withdraw(uint256 amount)
     onlyCurator()
-    returns (bool) {
+    returns (uint256) {
         if (amount <= 0) revert();
         if (amount > curatorCurrentBalance) revert();
 
@@ -162,6 +168,8 @@ contract DigitalArtWork {
             revert();
         }
 
-        return true;
+        curatorCurrentBalance -= amount;
+
+        return amount;
     }
 }
