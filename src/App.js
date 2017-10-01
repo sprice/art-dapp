@@ -17,6 +17,9 @@ class App extends Component {
     this.unlist = this.unlist.bind(this)
     this.buy = this.buy.bind(this)
     this.withdraw = this.withdraw.bind(this)
+    this.updateListingAmount = this.updateListingAmount.bind(this)
+    this.updateWithdrawalAmount = this.updateWithdrawalAmount.bind(this)
+    this.destory = this.destory.bind(this)
 
     this.state = {
       web3: null,
@@ -25,6 +28,7 @@ class App extends Component {
       artThumbHash: '',
       artHash: '',
       listingPrice: 0,
+      newListingPrice: 0,
       title: '',
       artistName: '',
       artist: '',
@@ -35,7 +39,8 @@ class App extends Component {
       ipfsBase: '//ipfs.io/ipfs/',
       account: null,
       instance: null,
-      curatorCurrentBalance: 0
+      curatorCurrentBalance: 0,
+      newWithdrawalAmount: 0
     }
   }
 
@@ -98,7 +103,6 @@ class App extends Component {
 
                 if (isBigNumber) newState[key] = value.toNumber()
                 else newState[key] = value
-                console.log(newState)
                 this.setState(newState)
               }
             })
@@ -116,10 +120,9 @@ class App extends Component {
 
   listForSale(evt) {
     evt.preventDefault()
-    const ether = 2
-    const amount = parseInt(this.state.web3.toWei(ether, 'ether'), 10)
+    const value = this.state.newListingPrice
     const date = parseInt(new Date().getTime() / 1000, 10)
-    this.state.instance.listWorkForSale(amount, date, {from: this.state.account}).then((tx) => {
+    this.state.instance.listWorkForSale(value, date, {from: this.state.account}).then((tx) => {
       this.updateState()
     })
   }
@@ -133,8 +136,7 @@ class App extends Component {
 
   buy(evt) {
     evt.preventDefault()
-    const ether = 2
-    const value = parseInt(this.state.web3.toWei(ether, 'ether'), 10)
+    const value = this.state.listingPrice
     this.state.instance.buy({
       from: this.state.account,
       value
@@ -150,6 +152,25 @@ class App extends Component {
     this.state.instance.withdraw(value, {from: this.state.account}).then((tx) => {
       this.updateState()
     })
+  }
+
+  destory(evt) {
+    evt.preventDefault()
+    this.state.instance.destroy({from: this.state.account}).then((tx) => {
+      this.updateState()
+    })
+  }
+
+  updateListingAmount(event) {
+    const ether = event.target.value
+    const newListingPrice = this.state.web3.toWei(ether, 'ether');
+    this.setState({newListingPrice})
+  }
+
+  updateWithdrawalAmount(event) {
+    const ether = event.target.value
+    const newWithdrawalAmount = this.state.web3.toWei(ether, 'ether');
+    this.setState({newWithdrawalAmount})
   }
 
   render() {
@@ -215,61 +236,78 @@ class App extends Component {
                     : <span>This work has not yet been signed by the artist</span>
                   }
                 </em>
-              </div>
-              <div>
-                <ul>
-                  <li>Account: {this.state.account}</li>
-                  <li>Owner: {this.state.owner}</li>
-                  <li>Artist: {this.state.artist}</li>
-                  <li>Curator: {this.state.curator}</li>
-                </ul>
+                <div>
+                  <ul>
+                    <li>Account: {this.state.account}</li>
+                    <li>Owner: {this.state.owner}</li>
+                    <li>Artist: {this.state.artist}</li>
+                    <li>Curator: {this.state.curator}</li>
+                  </ul>
+                </div>
               </div>
 
-
-              {isArtist && !this.state.artistHasSigned
-                ? (
+              {/*{isArtist && !this.state.artistHasSigned
+                ? (*/}
                   <div>
                     <span><a className="pure-button" onClick={this.sign}>Sign Art</a></span>
                   </div>
-                  )
+                  {/*)
                 : <span/>
-              }
+              }*/}
 
-              {isOwner && !this.state.forSale
-                ? (
+              {/*{isOwner && !this.state.forSale
+                ? (*/}
                   <div>
+                    <label htmlFor="listingAmount">Amount (ETH)</label>
+                    <input
+                      id="listingAmount"
+                      type="number"
+                      placeholder="ETH"
+                      onChange={this.updateListingAmount}
+                    />
                     <span><a className="pure-button" onClick={this.listForSale}>List for sale</a></span>
                   </div>
-                  )
+                  {/*)
                 : <span/>
-              }
+              }*/}
 
-              {isOwner && this.state.forSale
-                ? (
+              {/*{isOwner && this.state.forSale
+                ? (*/}
                   <div>
                     <span><a className="pure-button" onClick={this.unlist}>Unlist from sale</a></span>
                   </div>
-                )
+                {/*)
                 : <span/>
-              }
+              }*/}
 
-              {this.state.forSale && (!isArtist || !isOwner)
-                ? (
+              {/*{this.state.forSale && (!isArtist || !isOwner)
+                ? (*/}
                   <div>
                     <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
+                    <span>{saleAmount} ETH</span>
                   </div>
-                  )
+                  {/*)
                 : <span/>
-              }
+              }*/}
 
-              {isCurator
-                ? (
+              {/*{isCurator
+                ? (*/}
                   <div>
+                    <label htmlFor="withdrawalAmount">Amount (ETH)</label>
+                    <input
+                      id="withdrawalAmount"
+                      type="number"
+                      placeholder="ETH"
+                      onChange={this.updateWithdrawalAmount}
+                    />
                     <span><a className="pure-button" onClick={this.withdraw}>Withdraw</a></span>
                   </div>
-                  )
+                  <div>
+                    <span><a className="pure-button" onClick={this.destory}>Destory</a></span>
+                  </div>
+                  {/*)
                 : <span/>
-              }
+              }*/}
             </div>
           </div>
         </main>
