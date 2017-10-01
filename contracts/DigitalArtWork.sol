@@ -172,4 +172,9 @@ contract DigitalArtWork {
 
         return amount;
     }
+
+    function destroy()
+    onlyCurator() {
+        selfdestruct(curator);
+    }
 }
