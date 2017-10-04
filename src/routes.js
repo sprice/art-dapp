@@ -5,7 +5,7 @@ import {
   Switch
 } from 'react-router-dom'
 
-import App from './App'
+import Homepage from './Homepage'
 import Page from './Page'
 import NotFound from './NotFound'
 
@@ -13,7 +13,7 @@ const Routes = () => (
   <Router>
     <div>
       <Switch>
-        <Route exact path="/" component={App}/>
+        <Route exact path="/" component={Homepage}/>
         <Route path="/a/:id" component={Page}/>
         <Route component={NotFound}/>
       </Switch>

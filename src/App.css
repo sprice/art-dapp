@@ -84,3 +84,16 @@ img {
 .nav-column.account {
   text-align: right
 }
+
+.network-name {
+  text-transform: capitalize;
+}
+
+footer {
+  padding: 10px;
+  color: #fff;
+  background: #0c1a2b;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
