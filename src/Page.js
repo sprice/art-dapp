@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
+import getContract from './utils/getContract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -13,6 +14,7 @@ class App extends Component {
     super(props)
     // const {id} = props.match.params
 
+    this.loadWeb3 = this.loadWeb3.bind(this)
     this.updateState = this.updateState.bind(this)
     this.sign = this.sign.bind(this)
     this.listForSale = this.listForSale.bind(this)
@@ -52,18 +54,10 @@ class App extends Component {
   }
 
   componentWillMount() {
-    // Listen for network change
-    setInterval(() => {
-        if (this.state.web3) {
-            getNetwork(this.state.web3).then((network) => {
-                this.setState({
-                    networkName: network.name,
-                    networkId: network.id
-                })
-            })
-        }
-    }, 100)
+    this.loadWeb3()
+  }
 
+  loadWeb3() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
     getWeb3
@@ -71,14 +65,31 @@ class App extends Component {
       this.setState({
         web3: results.web3
       })
+      return getNetwork(this.state.web3)
+    }).then((network) => {
+      this.setState({
+        networkName: network.name,
+        networkId: network.id
+      })
       // Instantiate contract once web3 provided.
       return this.instantiateContract()
     })
     .then(() => {
       this.updateState()
+      setInterval(() => {
+          if (this.state.web3) {
+              getNetwork(this.state.web3).then((network) => {
+                  if (this.state.networkId !== network.id) this.instantiateContract()
+                  this.setState({
+                      networkName: network.name,
+                      networkId: network.id
+                  })
+              })
+          }
+      }, 100)
     })
     .catch((err) => {
-      console.error('Error', err)
+      // console.log('Error', err)
     })
   }
 
@@ -91,43 +102,46 @@ class App extends Component {
     return new Promise((resolve, reject) => {
       this.state.web3.eth.getAccounts((error, accounts) => {
         if (accounts[0]) this.setState({account: accounts[0]})
+        const contractId = getContract(this.state.networkName)
+        // digitalArtWork.at(contractId).then((instance) => {
         digitalArtWork.deployed().then((instance) => {
-          this.setState({contractLoaded: true})
-        // digitalArtWork.at('0x0912279429798e39540fceb92434549ac3b4a4bc').then((instance) => {
-          return this.setState({instance})
-        }).then(() => {
+          this.setState({
+            instance,
+            contractLoaded: true
+          })
           return resolve()
         }).catch((err) => {
-          return resolve(err)
+          this.setState({
+            contractLoaded: false
+          })
+          return reject(err)
         })
       })
     })
   }
 
   updateState() {
-    console.log('check')
-    if (this.contractLoaded) {
-        for (let i=0; i < DigitalArtWork.abi.length; i++) {
-          let instance = DigitalArtWork.abi[i]
-          let key = DigitalArtWork.abi[i].name
-          if (instance.constant === true &&
-              instance.inputs.length === 0 &&
-              instance.payable === false &&
-              instance.type === 'function') {
-                this.state.instance[key].call().then((value) => {
-                  let inState = this.state.hasOwnProperty(key)
-                  if (inState) {
-                    let isBigNumber = typeof value === 'object' && typeof value.toNumber === 'function'
+    this.setState({contractLoaded: true})
+    for (let i=0; i < DigitalArtWork.abi.length; i++) {
+      let instance = DigitalArtWork.abi[i]
+      let key = DigitalArtWork.abi[i].name
+      if (instance.constant === true &&
+          instance.inputs.length === 0 &&
+          instance.payable === false &&
+          instance.type === 'function') {
+            this.state.instance[key].call().then((value) => {
+              let inState = this.state.hasOwnProperty(key)
+              if (inState) {
+                let isBigNumber = typeof value === 'object' && typeof value.toNumber === 'function'
 
-                    let newState = {}
+                let newState = {}
 
-                    if (isBigNumber) newState[key] = value.toNumber()
-                    else newState[key] = value
-                    this.setState(newState)
-                  }
-                })
-          }
-        }
+                if (isBigNumber) newState[key] = value.toNumber()
+                else newState[key] = value
+                this.setState(newState)
+              }
+            })
+      }
     }
     // Called before for loop finishes
   }
