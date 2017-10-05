@@ -15,6 +15,7 @@ class App extends Component {
 
     this.loadWeb3 = this.loadWeb3.bind(this)
     this.updateState = this.updateState.bind(this)
+    this.setProvenence = this.setProvenence.bind(this)
     this.sign = this.sign.bind(this)
     this.listForSale = this.listForSale.bind(this)
     this.unlist = this.unlist.bind(this)
@@ -28,7 +29,7 @@ class App extends Component {
 
     this.state = {
       web3: null,
-      curator: '',
+      contractOwner: '',
       owner: '',
       artThumbHash: '',
       artHash: '',
@@ -44,12 +45,14 @@ class App extends Component {
       ipfsBase: '//ipfs.io/ipfs/',
       account: null,
       instance: null,
-      curatorCurrentBalance: 0,
       newWithdrawalAmount: 0,
       contractLoaded: false,
       networkName: '',
       networkId: 0,
-      pageId: props.match.params.id
+      pageId: props.match.params.id,
+      numSales: 0,
+      provenence: [],
+      emptyCellMarker: '-'
     }
   }
 
@@ -76,11 +79,9 @@ class App extends Component {
     })
     .then(() => {
       setInterval(() => {
-          console.log('checking network')
           if (this.state.web3) {
               getNetwork(this.state.web3).then((network) => {
                   if (this.state.networkId !== network.id) {
-                    console.log('change network')
                     this.instantiateContract()
                   }
                   this.setState({
@@ -132,7 +133,7 @@ class App extends Component {
 
   updateState() {
     this.setState({contractLoaded: true})
-    for (let i=0; i < DigitalArtWork.abi.length; i++) {
+    for (let i = 0; i < DigitalArtWork.abi.length; i++) {
       let instance = DigitalArtWork.abi[i]
       let key = DigitalArtWork.abi[i].name
       if (instance.constant === true &&
@@ -152,8 +153,27 @@ class App extends Component {
               }
             })
       }
+      if (instance.name === 'getSalesNum') {
+        this.state.instance[key].call().then((value) => {
+          const provenenceLength = value.toNumber()
+          let provenence = []
+          for (let i = 0; i < provenenceLength; i++) {
+            this.state.instance['provenence'].call(i).then((value) => {
+              provenence.push({
+                address: value[0],
+                amount: value[1].toNumber(),
+                date: value[2].toNumber()
+              })
+              if (i === (provenenceLength - 1)) this.setProvenence(provenence)
+            })
+          }
+        })
+      }
     }
-    // Called before for loop finishes
+  }
+
+  setProvenence(provenence) {
+    if (provenence.length) this.setState({provenence})
   }
 
   sign(evt) {
@@ -196,9 +216,7 @@ class App extends Component {
 
   withdraw(evt) {
     evt.preventDefault()
-    const ether = 0.3
-    const value = this.state.web3.toWei(ether, 'ether');
-    this.state.instance.withdraw(value, {from: this.state.account}).then((tx) => {
+    this.state.instance.withdraw({from: this.state.account}).then((tx) => {
       console.log('withdraw tx', tx)
       this.updateState()
     })
@@ -224,6 +242,34 @@ class App extends Component {
     this.setState({newWithdrawalAmount})
   }
 
+  renderProvenence() {
+    return (
+      <div>
+        <h4>Provenence</h4>
+        <table className="pure-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.provenence && this.state.provenence.map((p, i) => {
+              return (
+                <tr key={i}>
+                  <td>{new Date(p.date * 1000).toDateString()}</td>
+                  <td>{this.state.web3.fromWei(p.amount, 'ether')} ETH</td>
+                  <td>{p.address}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
   renderNoContract() {
     return (
       <h1>No contract found</h1>
@@ -231,6 +277,10 @@ class App extends Component {
   }
 
   renderContract() {
+
+    const isArtist = this.state.account === this.state.artist
+    const isOwner = this.state.account === this.state.owner
+    const isContractOwner = this.state.account === this.state.contractOwner
 
     const thumbnail = this.state.ipfsBase + this.state.artThumbHash
 
@@ -249,8 +299,6 @@ class App extends Component {
           </div>
           <div>
             <em>
-              <div>The listing price is {saleAmount} ETH</div>
-              <div>Sale Date {this.state.forSaleDate}</div>
               {this.state.forSale
                 ? <span>This work is for sale: {saleAmount} ETH</span>
                 : <span>This work is not for sale</span>
@@ -264,27 +312,19 @@ class App extends Component {
                 : <span>This work has not yet been signed by the artist</span>
               }
             </em>
-            <div>
-              <ul>
-                <li>Account: {this.state.account}</li>
-                <li>Owner: {this.state.owner}</li>
-                <li>Artist: {this.state.artist}</li>
-                <li>Curator: {this.state.curator}</li>
-              </ul>
-            </div>
           </div>
 
-          {/*{isArtist && !this.state.artistHasSigned
-            ? (*/}
+          {isArtist && !this.state.artistHasSigned
+            ? (
               <div>
                 <span><a className="pure-button" onClick={this.sign}>Sign Art</a></span>
               </div>
-              {/*)
+              )
             : <span/>
-          }*/}
+          }
 
-          {/*{isOwner && !this.state.forSale
-            ? (*/}
+          {isOwner && !this.state.forSale
+            ? (
               <div>
                 <label htmlFor="listingAmount">Amount (ETH)</label>
                 <input
@@ -295,47 +335,42 @@ class App extends Component {
                 />
                 <span><a className="pure-button" onClick={this.listForSale}>List for sale</a></span>
               </div>
-              {/*)
+              )
             : <span/>
-          }*/}
+          }
 
-          {/*{isOwner && this.state.forSale
-            ? (*/}
+          {isOwner && this.state.forSale
+            ? (
               <div>
                 <span><a className="pure-button" onClick={this.unlist}>Unlist from sale</a></span>
               </div>
-            {/*)
+            )
             : <span/>
-          }*/}
+          }
 
-          {/*{this.state.forSale && (!isArtist || !isOwner)
-            ? (*/}
+          {this.state.forSale && (!isArtist || !isOwner)
+            ? (
               <div>
                 <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
                 <span>{saleAmount} ETH</span>
               </div>
-              {/*)
+              )
             : <span/>
-          }*/}
+          }
 
-          {/*{isCurator
-            ? (*/}
+          {isContractOwner
+            ? (
               <div>
-                <label htmlFor="withdrawalAmount">Amount (ETH)</label>
-                <input
-                  id="withdrawalAmount"
-                  type="number"
-                  placeholder="ETH"
-                  onChange={this.updateWithdrawalAmount}
-                />
-                <span><a className="pure-button" onClick={this.withdraw}>Withdraw</a></span>
+                <div>
+                  <span><a className="pure-button" onClick={this.withdraw}>Withdraw</a></span>
+                </div>
+                <div>
+                  <span><a className="pure-button" onClick={this.destory}>Destory</a></span>
+                </div>
               </div>
-              <div>
-                <span><a className="pure-button" onClick={this.destory}>Destory</a></span>
-              </div>
-              {/*)
+              )
             : <span/>
-          }*/}
+          }
         </div>
     );
   }
@@ -344,15 +379,15 @@ class App extends Component {
 
     const isArtist = this.state.account === this.state.artist
     const isOwner = this.state.account === this.state.owner
-    const isCurator = this.state.account === this.state.curator
+    const isContractOwner = this.state.account === this.state.contractOwner
 
     let identity = ''
     if (isArtist) identity = 'You are the artist'
     if (isOwner) identity = 'You are the owner'
-    if (isCurator) identity = 'You are the curator'
+    if (isContractOwner) identity = 'You are the contract owner'
     if (isArtist && isOwner) identity = 'You are the artist & owner'
-    if (isOwner && isCurator) identity = 'You are the curator & owner'
-    if (isArtist && isOwner && isCurator) identity = 'You are the curator & artist & owner'
+    if (isOwner && isContractOwner) identity = 'You are the contract owner & owner'
+    if (isArtist && isOwner && isContractOwner) identity = 'You are the contract owner & artist & owner'
 
     return (
       <div className="App">
@@ -372,18 +407,18 @@ class App extends Component {
         </nav>
 
         <main className="container">
-          <div className="pure-g">
+          <div>
             <div className="pure-u-1-1">
                 {this.state.contractLoaded
                   ? this.renderContract()
                   : this.renderNoContract()
                 }
             </div>
+            <div>
+              {(this.state.provenence.length > 0) && this.renderProvenence()}
+            </div>
           </div>
         </main>
-        <footer>
-          <div>Network: <span className="network-name">{this.state.networkName}</span></div>
-        </footer>
       </div>
     )
   }
