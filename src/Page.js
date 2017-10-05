@@ -12,7 +12,6 @@ import './App.css'
 class App extends Component {
   constructor(props) {
     super(props)
-    // const {id} = props.match.params
 
     this.loadWeb3 = this.loadWeb3.bind(this)
     this.updateState = this.updateState.bind(this)
@@ -49,7 +48,8 @@ class App extends Component {
       newWithdrawalAmount: 0,
       contractLoaded: false,
       networkName: '',
-      networkId: 0
+      networkId: 0,
+      pageId: props.match.params.id
     }
   }
 
@@ -75,11 +75,14 @@ class App extends Component {
       return this.instantiateContract()
     })
     .then(() => {
-      this.updateState()
       setInterval(() => {
+          console.log('checking network')
           if (this.state.web3) {
               getNetwork(this.state.web3).then((network) => {
-                  if (this.state.networkId !== network.id) this.instantiateContract()
+                  if (this.state.networkId !== network.id) {
+                    console.log('change network')
+                    this.instantiateContract()
+                  }
                   this.setState({
                       networkName: network.name,
                       networkId: network.id
@@ -89,7 +92,7 @@ class App extends Component {
       }, 100)
     })
     .catch((err) => {
-      // console.log('Error', err)
+      console.log('Error', err)
     })
   }
 
@@ -102,13 +105,14 @@ class App extends Component {
     return new Promise((resolve, reject) => {
       this.state.web3.eth.getAccounts((error, accounts) => {
         if (accounts[0]) this.setState({account: accounts[0]})
-        const contractId = getContract(this.state.networkName)
+        const contractId = getContract(this.state.networkName, this.state.pageId)
         if (contractId) {
           digitalArtWork.at(contractId).then((instance) => {
             this.setState({
               instance,
               contractLoaded: true
             })
+            this.updateState()
             return resolve()
           }).catch((err) => {
             this.setState({
@@ -120,6 +124,7 @@ class App extends Component {
           this.setState({
             contractLoaded: false
           })
+          return resolve()
         }
       })
     })
