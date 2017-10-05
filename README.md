@@ -25,7 +25,10 @@ $ npm run migrate
 * `$ testrpc` (own shell)
 * Copy available account details
 * Set the `artist` in `2_deploy_contracts.js` as an address that you just copied
+* Set the `withdrawAddress` in `2_deploy_contracts.js` as an address that you just copied
 * `$ npm run migrate`
+* Note the contract address and set this address as the contractId in getContract.js. Where networkName = unknown and pageId = 1.
+* Navigate to the contract at localhost:3000/a/1
 * Load up fresh Metamask (see gotchas below)
 * Connect using mnemonic (this is the curator account)
 * Add the account with the private key of the artist address

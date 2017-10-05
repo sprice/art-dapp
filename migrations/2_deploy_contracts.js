@@ -8,7 +8,8 @@ module.exports = function(deployer) {
         title: 'La Mort de Marat',
         artistName: 'Jacques-Louis David',
         createdYear: 1793,
-        artist: '0x31a22f1129b20bb1123d9323452e52d68cc291b1'
+        artist: '0x6128309c95ea6e5c9dcb43f2d80c54764b52e4e9',
+        withdrawAddress: '0x378b89b1015b28873b5764bd507c822684ddea8a'
     }
 
     deployer.deploy(DigitalArtWork,
@@ -17,5 +18,6 @@ module.exports = function(deployer) {
                     a.title,
                     a.artistName,
                     a.createdYear,
-                    a.artist);
+                    a.artist,
+                    a.withdrawAddress);
 };
