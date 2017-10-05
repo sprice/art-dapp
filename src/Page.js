@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
-import getContract from './utils/getContract'
+// import getContract from './utils/getContract'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -102,7 +102,7 @@ class App extends Component {
     return new Promise((resolve, reject) => {
       this.state.web3.eth.getAccounts((error, accounts) => {
         if (accounts[0]) this.setState({account: accounts[0]})
-        const contractId = getContract(this.state.networkName)
+        // const contractId = getContract(this.state.networkName)
         // digitalArtWork.at(contractId).then((instance) => {
         digitalArtWork.deployed().then((instance) => {
           this.setState({
