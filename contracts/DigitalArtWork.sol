@@ -1,43 +1,97 @@
 pragma solidity 0.4.15;
 
 contract DigitalArtWork {
-    address public curator;
-    address public owner;
-    string public artThumbHash;
-    string public artHash;
-    uint256 public listingPrice;
-    string public title;
-    string public artistName;
-    address public artist;
-    uint public createdYear;
-    uint public forSaleDate;
-    uint public curatorCurrentBalance;
-    bool public forSale;
-    bool public artistHasSigned;
-    // The artist receives 85% of the initial sale amount
-    // and 10% of every subsequent sale.
-    // The contract owner receives 15% of every sale amount
-    uint32 private constant ownerShare = 75;
-    uint32 private constant artistShare = 10;
-    uint32 private constant curatorShare = 15;
 
-    struct OwnerProvenence {
+    /// LogPurchase is emitted when an artwork is purchased.
+    event LogPurchase(
+        address newOwner,
+        uint256 purchaseAmount
+    );
+
+    /// PayoutOwner is emitted when an owner is paid.
+    event PayoutOwner(
+        address owner,
+        uint256 purchaseAmount
+    );
+
+    /// PayoutArtist is emitted when an artist is paid.
+    event PayoutArtist(
+        address artist,
+        uint256 purchaseAmount
+    );
+
+    /// curator is the contract owner.
+    address public contractOwner;
+
+    /// withdrawAddress is the cold-storage address.
+    address private withdrawAddress;
+
+    // owner is the artwork owner.
+    address public owner;
+
+    /// artThumbHash is the IPFS hash of the artwork thumbnail.
+    string public artThumbHash;
+
+    /// artHash is the IPFS hash of the artwork thumbnail.
+    string public artHash;
+
+    /// listingPrice is the value in wei that the artwork is on sale for.
+    uint256 public listingPrice;
+
+    /// title is the name of the artwork.
+    string public title;
+
+    /// artistName is the artwork's artist name.
+    string public artistName;
+
+    /// artist is the artwork's artist wallet.
+    address public artist;
+
+    /// createdYear is the year the artwork was created.
+    uint public createdYear;
+
+    /// forSaleDate is the date at which the artwork is available for sale.
+    /// Stored as seconds since epoch.
+    uint public forSaleDate;
+
+    /// forSale flags whether the artwork is for sale.
+    bool public forSale;
+
+    /// artistHasSigned flags whether the artist has signed the artwork.
+    bool public artistHasSigned;
+
+    /// ownerShare is the percentage the owner of the artwork receives from a sale.
+    uint32 private constant ownerShare = 75;
+
+    /// artistShare is the percentage the artist of the artwork receives from a sale.
+    uint32 private constant artistShare = 10;
+
+    /// contractOwnerShare is the percentage the contract owner receives from a sale.
+    uint32 private constant contractOwnerShare = 15;
+
+    /// Provenence is a data structure to track the purchase details of the artwork.
+    struct Provenence {
         address owner;
         uint purchaseAmount;
         uint purchaseDate;
     }
-    OwnerProvenence[] public ownerProvenence;
 
+    /// provenence is an array of all artwork purchases.
+    Provenence[] public provenence;
+
+    /// onlyOwner ensures only the owner can execute a function.
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
-    modifier onlyCurator() {
-        require(msg.sender == curator);
+    /// onlyContractOwner ensures only the contract owner can execute a function.
+    modifier onlyContractOwner() {
+        require(msg.sender == contractOwner);
         _;
     }
 
+    /// onlyArtist ensures only the artwork artist can execute a function.
     modifier onlyArtist() {
         require(msg.sender == artist);
         _;
@@ -48,7 +102,8 @@ contract DigitalArtWork {
                             string _title,
                             string _artistName,
                             uint _createdYear,
-                            address _artist) {
+                            address _artist,
+                            address _withdrawAddress) {
 
         if (bytes(_artThumbHash).length == 0) revert();
         if (bytes(_artHash).length == 0) revert();
@@ -56,7 +111,9 @@ contract DigitalArtWork {
         if (bytes(_artistName).length == 0) revert();
         if (_createdYear == 0) revert();
         if (_artist == address(0)) revert();
+        if (_withdrawAddress == address(0)) revert();
 
+        // Set initial state of the artwork.
         artThumbHash = _artThumbHash;
         artHash = _artHash;
         title = _title;
@@ -64,53 +121,51 @@ contract DigitalArtWork {
         createdYear = _createdYear;
         artistHasSigned = false;
         forSale = false;
-        curatorCurrentBalance = 0;
 
-        // Set the artist
+        // Set the artist.
         artist = _artist;
 
-        // Initial owner is the artist
+        // The artist is the initial owner of the artwork.
         owner = _artist;
 
-        // Curator is the contract creator
-        curator = msg.sender;
+        // contractOwner is the contract creator
+        contractOwner = msg.sender;
+
+        // Set the withdraw address.
+        withdrawAddress = _withdrawAddress;
     }
 
-    event LogPurchase(address purchaseOwner, uint256 purchaseAmount);
-
+    /// If an artwork is for sale, process the purchase.
     function buy() payable returns (bool) {
         if (forSale != true) revert();
         if (artistHasSigned != true) revert();
-        if (msg.value != listingPrice) revert();
+        if (msg.value < listingPrice) revert();
         if (forSaleDate > now) revert();
 
-        // @TODO: deal with possible decimals?
         uint256 artistAmount = msg.value / 100 * artistShare;
         uint256 ownerAmount = msg.value / 100 * ownerShare;
-        uint256 curatorAmount = msg.value / 100 * curatorShare;
 
         // Send the artist their share
         if (!artist.send(artistAmount)) {
             revert();
         }
+        PayoutArtist(artist, msg.value);
 
         // Send the current owner their share
         if (!owner.send(ownerAmount)) {
             revert();
         }
+        PayoutOwner(owner, msg.value);
 
         // Artwork is no longer for sale
         forSale = false;
         forSaleDate = 0;
         listingPrice = 0;
 
-        // Track curator balance
-        curatorCurrentBalance += curatorAmount;
-
         // Change ownership
         owner = msg.sender;
 
-        ownerProvenence.push(OwnerProvenence({
+        provenence.push(Provenence({
             owner: owner,
             purchaseAmount: msg.value,
             purchaseDate: now
@@ -121,6 +176,7 @@ contract DigitalArtWork {
         return true;
     }
 
+    /// listWorkForSale allows the artist to list the artwork for sale.
     function listWorkForSale(uint256 _listingPrice, uint _forSaleDate)
     onlyOwner()
     public returns (bool) {
@@ -135,6 +191,7 @@ contract DigitalArtWork {
         return forSale;
     }
 
+    /// delistWorkForSale allows the artist to delist the artwork from sale.
     function delistWorkForSale() 
     onlyOwner()
     public returns (bool) {
@@ -147,6 +204,7 @@ contract DigitalArtWork {
         return forSale;
     }
 
+    /// signWork allows the artist to sign the work.
     function signWork() 
     onlyArtist() 
     public returns (bool) {
@@ -157,24 +215,20 @@ contract DigitalArtWork {
         return artistHasSigned;
     }
 
-    // Allow the contract owner to withdraw value
-    function withdraw(uint256 amount)
-    onlyCurator()
-    returns (uint256) {
-        if (amount <= 0) revert();
-        if (amount > curatorCurrentBalance) revert();
-
-        if (!curator.send(amount)) {
-            revert();
-        }
-
-        curatorCurrentBalance -= amount;
-
-        return amount;
+    /// getSalesNum returns the number of purchases.
+    function getSalesNum() constant returns (uint) {
+        return provenence.length;
     }
 
+    /// withdraw allows the contract owner to transfer out the contract balance.
+    function withdraw()
+    onlyContractOwner() {
+        withdrawAddress.transfer(this.balance);
+    }
+
+    /// Used for development. Remove for deployment.
     function destroy()
-    onlyCurator() {
-        selfdestruct(curator);
+    onlyContractOwner() {
+        selfdestruct(withdrawAddress);
     }
 }
