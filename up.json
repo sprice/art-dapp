@@ -5,7 +5,8 @@
     "us-east-1"
   ],
   "hooks": {
-    "build": "npm run build"
+    "build": "npm run build",
+    "clean": "rm -rf build_webpack"
   },
   "type": "static",
   "static": {
@@ -15,19 +16,5 @@
     "production": {
       "domain": "chill.ist"
     }
-  },
-  "dns": {
-    "chill.ist": [
-      {
-        "name": "chill.ist",
-        "type": "NS",
-        "value": [
-          "ns-16.awsdns-02.com",
-          "ns-1711.awsdns-21.co.uk",
-          "ns-1048.awsdns-03.org",
-          "ns-726.awsdns-26.net"
-        ]
-      }
-    ]
   }
 }
