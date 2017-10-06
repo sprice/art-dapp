@@ -5,8 +5,7 @@
     "us-east-1"
   ],
   "hooks": {
-    "build": "npm run build",
-    "clean": "rm -rf build_webpack"
+    "build": "npm run build"
   },
   "type": "static",
   "static": {
