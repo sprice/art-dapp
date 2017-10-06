@@ -3,14 +3,25 @@ var DigitalArtWork = artifacts.require("./DigitalArtWork.sol");
 module.exports = function(deployer) {
 
     var a = {
-        artThumbHash: 'QmVJi8akNp7qqdvPutGAumtUm4GRsPDrPjRzTAx2JozyJE',
-        artHash: 'QmbkQfD89eA3cb6pncUF6rUbrqrkgDSyP11b9RbKb1NYXj',
-        title: 'La Mort de Marat',
-        artistName: 'Jacques-Louis David',
-        createdYear: 1793,
-        artist: '0x6128309c95ea6e5c9dcb43f2d80c54764b52e4e9',
-        withdrawAddress: '0x378b89b1015b28873b5764bd507c822684ddea8a'
+        artThumbHash: 'QmT7Tko852jEgrFE9EWT1gHeBjydsobFcQssq8YizPFeGJ',
+        artHash: 'QmTMBboQj3Kum7sffXJ4kvnwwFKy8ycVCaQ9jjHcHHMvKY',
+        title: 'Autumn',
+        artistName: 'Shawn Price',
+        createdYear: 2017,
+        artist: '',
+        withdrawAddress: ''
     }
+
+    // // Rinkeby Test
+    // var a = {
+    //     artThumbHash: 'QmT7Tko852jEgrFE9EWT1gHeBjydsobFcQssq8YizPFeGJ',
+    //     artHash: 'QmTMBboQj3Kum7sffXJ4kvnwwFKy8ycVCaQ9jjHcHHMvKY',
+    //     title: 'Autumn',
+    //     artistName: 'Shawn Price',
+    //     createdYear: 2017,
+    //     artist: '0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E', // Shawn's Metamask Address
+    //     withdrawAddress: '0xB659225621BeF60ac15Ef0E7d2f79c3647b40315' // Shawn's cold storage Rinkeby address
+    // }
 
     deployer.deploy(DigitalArtWork,
                     a.artThumbHash,
