@@ -61,13 +61,13 @@ contract DigitalArtWork {
     bool public artistHasSigned;
 
     /// ownerShare is the percentage the owner of the artwork receives from a sale.
-    uint32 private constant ownerShare = 75;
+    uint32 private constant ownerShare = 80;
 
     /// artistShare is the percentage the artist of the artwork receives from a sale.
     uint32 private constant artistShare = 10;
 
     /// contractOwnerShare is the percentage the contract owner receives from a sale.
-    uint32 private constant contractOwnerShare = 15;
+    uint32 private constant contractOwnerShare = 10;
 
     /// Provenence is a data structure to track the purchase details of the artwork.
     struct Provenence {
