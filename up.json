@@ -5,7 +5,8 @@
     "us-east-1"
   ],
   "hooks": {
-    "build": "npm run build"
+    "build": "npm run build",
+    "clean": "npm run clean"
   },
   "type": "static",
   "static": {
