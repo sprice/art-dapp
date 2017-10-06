@@ -1,7 +1,13 @@
 {
   "name": "chillist",
   "profile": "up",
-  "regions": ["us-east-1"],
+  "regions": [
+    "us-east-1",
+    "us-west-2",
+    "eu-central-1",
+    "sa-east-1",
+    "ap-southeast-1"
+  ],
   "hooks": {
     "build": "npm run build"
   },
@@ -12,9 +18,20 @@
   "stages": {
     "production": {
       "domain": "chill.ist"
-    },
-    "staging": {
-      "domain": "ropsten.chill.ist"
     }
+  },
+  "dns": {
+    "chill.ist": [
+      {
+        "name": "chill.ist",
+        "type": "NS",
+        "value": [
+          "ns-16.awsdns-02.com",
+          "ns-1711.awsdns-21.co.uk",
+          "ns-1048.awsdns-03.org",
+          "ns-726.awsdns-26.net"
+        ]
+      }
+    ]
   }
 }
