@@ -9,6 +9,49 @@ h1, h2, h3 {
   font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 
+h1.title {
+  text-align: center;
+  font-size: 56px;
+}
+
+
+a,
+a:visited {
+  color: blue;
+  text-decoration: none;
+}
+a:active,
+a:focus,
+a:hover {
+  color: black;
+}
+
+.info {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.info h2,
+.info p,
+.info > div,
+.info li {
+  text-align: left;
+}
+
+.info img {
+  float: left;
+  border: 10px solid #333;
+}
+
+.info > div {
+  clear: both;
+}
+
+.info p {
+  font-size: 18px;
+}
+
 code {
   display: block;
   margin: 20px 0 15px 0;
@@ -51,7 +94,8 @@ code {
 .navbar a:active,
 .navbar a:focus,
 .navbar a:hover {
-  background: #233e5e;
+  background: #000;
+  color: #fff;
 }
 
 .navbar .pure-menu-heading {
@@ -77,6 +121,11 @@ img.original {
   width: 100%;
 }
 
+img.selected-work {
+  width: 100%;
+  max-width: 200px;
+}
+
 .navbar {
   display: flex;
 }
@@ -88,6 +137,10 @@ img.original {
 
 .nav-column.account {
   text-align: right
+}
+
+.nav-column.right-item {
+  float: right;
 }
 
 .network-name {

@@ -305,7 +305,7 @@ class App extends Component {
 
   renderNoContract() {
     return (
-      <h1>No contract found</h1>
+      <h1>No artwork found on the {this.state.networkName} network.</h1>
     )
   }
 
@@ -331,7 +331,9 @@ class App extends Component {
 
     return (
         <div>
-          <h4><em>{identity}</em> 😁</h4>
+          {identity && (
+            <h4><em>{identity}</em> 😁</h4>
+          )}
           <h1>{this.state.title}</h1>
           <h4>{this.state.artistName}, {this.state.createdYear}</h4>
           <div>
@@ -427,13 +429,16 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-          <div className="nav-column">
-            <a href="#" className="pure-menu-heading pure-menu-link">Chill</a>
+          <div className="">
+            <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
           </div>
-          <div className="pure-menu-heading  nav-column account">
+          <div className="">
+            <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
+          </div>
+          <div className="nav-column account">
             {this.state.account
-              ? <span>Account: {this.state.account}</span>
-              : <span>Please connect to <a href="https://metamask.io/" target="_blank">Metamask</a></span>
+              ? <span className="pure-menu-heading">Account: {this.state.account}</span>
+              : <span className="pure-menu-heading">Please connect to <a href="https://metamask.io/" target="_blank">Metamask</a></span>
             }
           </div>
         </nav>
