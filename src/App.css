@@ -39,12 +39,13 @@ code {
 .navbar {
   position: fixed;
   padding: 5px;
-  background: #0c1a2b;
+  background: #FDD835;
   font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 
-.navbar a {
-  color: #fff;
+.navbar a,
+.navbar span {
+  color: #000;
 }
 
 .navbar a:active,
@@ -67,9 +68,13 @@ code {
   margin-right: 10px;
 }
 
-img {
+img.thumbnail {
   width: 100%;
   max-width: 420px;
+}
+
+img.original {
+  width: 100%;
 }
 
 .navbar {

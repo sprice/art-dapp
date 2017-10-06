@@ -7,6 +7,7 @@ const getNetwork = (web3) => new Promise(function(resolve, reject) {
       switch (netId) {
         case '1':
           network.name = 'mainnet'
+          network.etherscan = 'https://etherscan.io/'
           break
         case '2':
           network.name = 'morden'
@@ -14,15 +15,19 @@ const getNetwork = (web3) => new Promise(function(resolve, reject) {
           break
         case '3':
           network.name = 'ropsten'
+          network.etherscan = 'https://ropsten.etherscan.io/'
           break
         case '4':
           network.name = 'rinkeby'
+          network.etherscan = 'https://rinkeby.etherscan.io/'
           break
         case '42':
           network.name = 'kovan'
+          network.etherscan = 'https://kovan.etherscan.io/'
           break
         default:
           network.name = 'unknown'
+          network.etherscan = 'https://etherscan.io/'
       }
       return resolve(network)
     })
