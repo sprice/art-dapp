@@ -4,6 +4,9 @@
   "regions": [
     "us-east-1"
   ],
+  "lambda": {
+    "timeout": 10
+  },
   "hooks": {
     "build": "npm run build",
     "clean": "npm run clean"

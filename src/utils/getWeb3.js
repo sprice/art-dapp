@@ -28,7 +28,7 @@ let getWeb3 = new Promise(function(resolve, reject) {
       resolve(results)
     } else {
       // Fallback to localhost if no web3 injection.
-      var provider = new Web3.providers.HttpProvider(networks.local)
+      var provider = new Web3.providers.HttpProvider(networks.rinkeby)
 
       web3 = new Web3(provider)
 
