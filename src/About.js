@@ -19,8 +19,8 @@ const About = ({ match }) => (
             <h2>Purchase art using Ethereum</h2>
             <ul>
               <li>Install the <a href="https://metamask.io/">Metamask</a> Chrome extension.</li>
-              <li><strike>Buy Ethereum using Metamask (USA only). Otherwise, we recommend <a href="https://www.coinbase.com/buy-ethereum">Coinbase</a>.</strike></li>
-              <li>While Chill is in public beta, get test Ethereum using the <a href="https://www.rinkeby.io/">Rinkeby Faucet</a></li>
+              {/* <li>Buy Ethereum using Metamask (USA only). Otherwise, we recommend <a href="https://www.coinbase.com/buy-ethereum">Coinbase</a>.</li> */}
+              <li>While Chill is in public beta, acquire test Ethereum using the <a href="https://www.rinkeby.io/">Rinkeby Faucet</a></li>
             </ul>
           </div>
           <div className="info">
