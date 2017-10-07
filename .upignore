@@ -1,8 +1,11 @@
+!build_webpack/**
 config
 contracts
 migrations
+node_modules
 scripts
 src
 test
+app.js
 truffle.js
 truffle-config.js
