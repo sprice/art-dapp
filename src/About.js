@@ -20,7 +20,7 @@ const About = ({ match }) => (
             <ul>
               <li>Install the <a href="https://metamask.io/">Metamask</a> Chrome extension.</li>
               <li><strike>Buy Ethereum using Metamask (USA only). Otherwise, we recommend <a href="https://www.coinbase.com/buy-ethereum">Coinbase</a>.</strike></li>
-              <li>While Chill is in public beta, get test ether (the currency of Ethereum) using the <a href="https://www.rinkeby.io/">Rinkeby Faucet</a> (requires Github)</li>
+              <li>While Chill is in public beta, get test Ethereum using the <a href="https://www.rinkeby.io/">Rinkeby Faucet</a></li>
             </ul>
           </div>
           <div className="info">
