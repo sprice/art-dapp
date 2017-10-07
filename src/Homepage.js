@@ -1,12 +1,12 @@
 import React from 'react'
 
-const selectedWork = {
-  thumb: 'https://ipfs.io/ipfs/QmT7Tko852jEgrFE9EWT1gHeBjydsobFcQssq8YizPFeGJ',
-  title: 'Autumn',
-  artist: 'Shawn Price',
-  year: 2017,
-  url: '/a/1'
-}
+// const selectedWork = {
+//   thumb: 'https://ipfs.io/ipfs/QmT7Tko852jEgrFE9EWT1gHeBjydsobFcQssq8YizPFeGJ',
+//   title: 'Autumn',
+//   artist: 'Shawn Price',
+//   year: 2017,
+//   url: '/a/1'
+// }
 
 const Homepage = ({ match }) => (
   <div className="App">
@@ -34,11 +34,6 @@ const Homepage = ({ match }) => (
           <div className="info">
             <h2>Currently in Open Beta</h2>
             <p>Chill is just getting started. We&rsquo;re currently working with our initial group of artists. Please note we only have test content on the platform which is for sale using test currency. More details on our <a href="/about">About</a> page.</p>
-          </div>
-          <div className="info">
-            <h2>Selected Works</h2>
-            <img src={selectedWork.thumb} className="selected-work" alt="Autumn" />
-            <div><a href={selectedWork.url}>{selectedWork.title}</a></div>
           </div>
         </div>
       </div>
