@@ -10,7 +10,7 @@ class ChromecastButton extends Component {
             hash: props.hash,
             session: null,
             namespace: 'urn:x-cast:com.google.cast.chill.ist',
-            appId: '0FC03587',
+            appId: 'FBD5C31C',
             chrome: null
         }
 
