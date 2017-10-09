@@ -6,6 +6,10 @@ const server = express()
 
 server.use('/', express.static(path.join(__dirname, '/build_webpack')))
 
+server.get('/chromecast-receiver/player', (req, res) => {
+  res.sendFile(path.join(__dirname,'/build_webpack/chromecast-receiver.html'))
+})
+
 server.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname,'/build_webpack/index.html'))
 })
@@ -15,7 +19,7 @@ server.listen(port, () => {
   console.log('server listening on port ' + port)
 })
 
-}).call(this,require('path').join(__dirname, ''))
+}).call(this, require('path').join(__dirname, ''))
 },{"express":28,"path":undefined}],2:[function(require,module,exports){
 /*!
  * accepts

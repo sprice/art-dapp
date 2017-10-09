@@ -4,6 +4,10 @@ const server = express()
 
 server.use('/', express.static(path.join(__dirname, '/build_webpack')))
 
+server.get('/chromecast-receiver/player', (req, res) => {
+  res.sendFile(path.join(__dirname,'/build_webpack/chromecast-receiver.html'))
+})
+
 server.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname,'/build_webpack/index.html'))
 })

@@ -3,6 +3,7 @@ import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
 import getContract from './utils/getContract'
+import ChromecastButton from './ChromecastButton'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -333,6 +334,9 @@ class App extends Component {
         <div>
           {identity && (
             <h4><em>{identity}</em> 😁</h4>
+          )}
+          {isOwner && (
+            <ChromecastButton hash={this.state.artHash} />
           )}
           <h1>{this.state.title}</h1>
           <h4>{this.state.artistName}, {this.state.createdYear}</h4>
