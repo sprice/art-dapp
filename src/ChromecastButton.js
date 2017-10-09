@@ -45,19 +45,19 @@ class ChromecastButton extends Component {
     }
 
     onInitSuccess() {
-        // console.log('onInitSuccess')
+        console.log('onInitSuccess')
     }
 
     onError(message) {
-        // console.log('onError: ' + JSON.stringify(message))
+        console.log('onError: ' + JSON.stringify(message))
     }
 
     onSuccess(message) {
-        // console.log('onSuccess: ' + message);
+        console.log('onSuccess: ' + message);
     }
 
     sessionListener(e) {
-        // console.log('New session ID:' + e.sessionId);
+        console.log('New session ID:' + e.sessionId);
         this.setState({session: e})
         this.state.session.addUpdateListener(this.sessionUpdateListener);
         this.state.session.addMessageListener(this.state.namespace, this.receiverMessage);
@@ -66,22 +66,22 @@ class ChromecastButton extends Component {
     sessionUpdateListener(isAlive) {
         var message = isAlive ? 'Session Updated' : 'Session Removed';
         message += ': ' + this.state.session.sessionId;
-        // console.log(message)
+        console.log(message)
         if (!isAlive) {
           this.setState({session: null})
         }
     }
 
     receiverMessage(namespace, message) {
-        // console.log('receiverMessage: ' + namespace + ', ' + message);
+        console.log('receiverMessage: ' + namespace + ', ' + message);
     }
 
     receiverListener(e) {
         if(e === 'available') {
-          // console.log('receiver found');
+          console.log('receiver found');
         }
         else {
-          // console.log('receiver list empty');
+          console.log('receiver list empty');
         }
     }
 
