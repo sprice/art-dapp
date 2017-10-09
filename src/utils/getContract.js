@@ -5,12 +5,18 @@ const getContract = (networkName, pageId) => {
         contractId = false
         break
     case 'rinkeby':
-        contractId = false
+        switch(pageId) {
+        case '1':
+            contractId = '0x0a1fa1e2fcab5014cdb9e850280ed404c1a01e1e'
+            break
+        default:
+            contractId = false
+        }
         break
     case 'unknown':
         switch(pageId) {
         case '1':
-            contractId = '0x007bb38a26a84d36c845db7f47aa5d25b241ab16'
+            contractId = ''
             break
         default:
             contractId = false
