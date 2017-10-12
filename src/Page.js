@@ -324,15 +324,16 @@ class App extends Component {
     )
   }
 
-  renderArtwork(isOwner) {
+  renderArtwork() {
+    const isOwner = this.state.account === this.state.owner
     if (!this.state.artThumbHash || !this.state.artHash) return
     const thumbnail = this.state.ipfsBase + this.state.artThumbHash
     const artwork = this.state.ipfsBase + this.state.artHash
 
     if (isOwner) {
-        return <img src={thumbnail} alt={this.state.title} className="thumbnail" />
+        return <a href={artwork} target="_blank"><img src={artwork} alt={this.state.title} className="Artwork Original" /></a>
     } else {
-      return <img src={artwork} alt={this.state.title} className="original" />
+      return <img src={thumbnail} alt={this.state.title} className="Artwork Thumbnail" />
     }
   }
 
