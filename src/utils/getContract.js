@@ -16,7 +16,7 @@ const getContract = (networkName, pageId) => {
     case 'unknown':
         switch(pageId) {
         case '1':
-            contractId = ''
+            contractId = '0x2de9339c7c9d88fe853330380d18b4a563861700'
             break
         default:
             contractId = false

@@ -1,39 +1,33 @@
 import React from 'react'
 
 const About = ({ match }) => (
-  <div className="App">
-    <nav className="navbar pure-menu pure-menu-horizontal">
-      <div className="">
-        <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-      </div>
-      <div className="">
-        <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-      </div>
-    </nav>
-
-    <main className="container">
+  <div className="app">
+    <div className="primary">
+      <nav className="navbar pure-menu pure-menu-horizontal">
+        <div className="">
+          <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
+        </div>
+        <div className="">
+          <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
+        </div>
+      </nav>
       <div className="pure-g">
         <div className="pure-u-1-1">
-          <h1 className="title">About Chill</h1>
+          <h1 className="center title">About Chill</h1>
           <div className="info">
-            <h2>Purchase art using Ethereum</h2>
-            <ul>
-              <li>Install the <a href="https://metamask.io/">Metamask</a> Chrome extension.</li>
-              {/* <li>Buy Ethereum using Metamask (USA only). Otherwise, we recommend <a href="https://www.coinbase.com/buy-ethereum">Coinbase</a>.</li> */}
-              <li>While Chill is in public beta, acquire test Ethereum using the <a href="https://www.rinkeby.io/">Rinkeby Faucet</a></li>
-            </ul>
-          </div>
-          <div className="info">
-            <h2>Connect Metamask to the Rinkeby test network</h2>
-            <p>Chill is in public beta and works of art are not for sale for real ether (the currency of Ethereum). We&rsquo;re currently using the Rinkeby test network. Make sure Metamask is connected to Rinkeby.</p>
-          </div>
-          <div className="info">
-            <h2>Treasure your Metamask/Ethereum account</h2>
-            <p>The account you use to purchase art will be recorded as the owner of the artwork. If you lose access to your account you lose access to the rights of ownership.</p>
+            <h2>A new way to think about digital ownership</h2>
+            <p>The Blockchain allows for trustless proof that an artwork created on the Chill platform is unique, rare, and authentic. There is also the added benefit that all functions of an artwork, from buying and selling to loaning, can occur with or without the Chill platform. Once an artwork is created, it is permanent. If Chill should ever shut down or dissapear, your art will continue to exist and remain yours.</p>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+    <div className="secondary">
+      <div className="frame-wrap">
+        <div className="frame">
+            <img className="main-image" src="/img/1.jpg" alt="Pineapple" />
+        </div>
+      </div>
+    </div>
   </div>
 )
 

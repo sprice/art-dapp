@@ -26,6 +26,7 @@ class App extends Component {
     this.destory = this.destory.bind(this)
     this.renderContract = this.renderContract.bind(this)
     this.renderNoContract = this.renderNoContract.bind(this)
+    this.renderArtwork = this.renderArtwork.bind(this)
 
     this.state = {
       web3: null,
@@ -310,14 +311,22 @@ class App extends Component {
     )
   }
 
+  renderArtwork(isOwner) {
+    const thumbnail = this.state.ipfsBase + this.state.artThumbHash
+    const artwork = this.state.ipfsBase + this.state.artHash
+
+    if (isOwner) {
+        return <img src={thumbnail} alt={this.state.title} className="thumbnail" />
+    } else {
+      return <img src={artwork} alt={this.state.title} className="original" />
+    }
+  }
+
   renderContract() {
 
     const isArtist = this.state.account === this.state.artist
     const isOwner = this.state.account === this.state.owner
     const isContractOwner = this.state.account === this.state.contractOwner
-
-    const thumbnail = this.state.ipfsBase + this.state.artThumbHash
-    const artwork = this.state.ipfsBase + this.state.artHash
 
     let saleAmount = ''
     if (this.state.web3) saleAmount = this.state.web3.fromWei(this.state.listingPrice, 'ether')
@@ -339,16 +348,9 @@ class App extends Component {
             <ChromecastButton hash={this.state.artHash} />
           )}
           <h1>{this.state.title}</h1>
-          <h4>{this.state.artistName}, {this.state.createdYear}</h4>
-          <div>
-            {!isOwner && this.state.artThumbHash
-              ? <img src={thumbnail} alt={this.state.title} className="thumbnail" />
-              : <span/>
-            }
-            {isOwner && this.state.artHash
-              ? <img src={artwork} alt={this.state.title} className="original" />
-              : <span/>
-            }
+          <h2>{this.state.artistName}, {this.state.createdYear}</h2>
+          <div className="description">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nulla eu odio semper malesuada. Sed non ex elit. Maecenas quis massa sagittis, gravida odio ut, ultrices tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam iaculis augue in convallis congue. Etiam cursus malesuada sapien eu rutrum.</p>
           </div>
           <div>
             <em>
@@ -431,38 +433,40 @@ class App extends Component {
   render() {
 
     return (
-      <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal">
-          <div className="">
-            <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-          </div>
-          <div className="">
-            <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-          </div>
-          <div className="nav-column account">
-            {this.state.account
-              ? <span className="pure-menu-heading">Account: {this.state.account}</span>
-              : <span className="pure-menu-heading">Please connect to <a href="https://metamask.io/" target="_blank">Metamask</a></span>
-            }
-          </div>
-        </nav>
-
-        <main className="container">
-          <div>
+      <div className="app">
+        <div className="primary">
+          <nav className="navbar pure-menu pure-menu-horizontal">
+            <div className="">
+              <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
+            </div>
+            <div className="">
+              <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
+            </div>
+          </nav>
+          <div className="pure-g">
             <div className="pure-u-1-1">
                 {this.state.contractLoaded
                   ? this.renderContract()
                   : this.renderNoContract()
                 }
             </div>
-            <div>
+            <div className="pure-u-1-1">
               {(this.state.transactions.length > 0) && this.renderTransactions()}
             </div>
-            <div>
+            <div className="pure-u-1-1">
               {(this.state.provenence.length > 0) && this.renderProvenence()}
             </div>
           </div>
-        </main>
+        </div>
+        <div className="secondary">
+          <div className="frame-wrap">
+            {this.state.contractLoaded && (
+              <div className="frame">
+                  {this.renderArtwork()}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     )
   }

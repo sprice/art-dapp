@@ -9,11 +9,17 @@ h1, h2, h3 {
   font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 
-h1.title {
-  text-align: center;
-  font-size: 56px;
+h1 {
+  font-size: 4em;
 }
 
+h1.center {
+  text-align: center;
+}
+
+h2 {
+  font-size: 2em;
+}
 
 a,
 a:visited {
@@ -48,7 +54,7 @@ a:hover {
   clear: both;
 }
 
-.info p {
+p {
   font-size: 18px;
 }
 
@@ -63,6 +69,75 @@ code {
   box-sizing: border-box;
   width: 100%;
   padding: 45px 20px;
+}
+
+.app {
+  display: flex;
+  flex-flow: row wrap;
+  background-color: #F44336;
+  align-items: stretch;
+}
+
+.primary {
+  padding-bottom: 30px;
+}
+
+@media all and (min-width: 800px) {
+
+  .primary {
+    padding-bottom: 0;
+  }
+
+  .primary {
+    min-height: 100vh;
+  }
+}
+
+.primary {
+  background-color: #fff;
+  margin-bottom: 30px;
+}
+
+.primary .pure-g {
+  padding: 0 10px;
+}
+
+@media all and (min-width: 800px) {
+  .primary {
+    margin-bottom: 0;
+  }
+}
+
+nav, .primary, .secondary {
+  flex: 1 100%;
+}
+
+.secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F44336;
+}
+
+@media all and (min-width: 800px) {
+  .primary {
+    flex: 50% 0;
+    order: 1;
+  }
+
+  .secondary {
+    flex: 50% 0;
+    order: 2;
+    height: 100vh;
+  }
+
+  .frame-wrap {
+    position: fixed;
+  }
+}
+
+.main-image {
+  width: 100%;
 }
 
 .pure-button-primary {
@@ -80,9 +155,8 @@ code {
 /* NAVBAR */
 
 .navbar {
-  position: fixed;
   padding: 5px;
-  background: #FDD835;
+  background: #fff;
   font-family: 'Oswald', 'Arial Narrow', sans-serif;
 }
 
