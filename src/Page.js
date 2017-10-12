@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import DatePicker from 'react-datepicker'
+import moment from 'moment'
 import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
@@ -9,6 +11,7 @@ import './css/oswald.css'
 import './css/open-sans.css'
 import './css/pure-min.css'
 import './App.css'
+import './css/react-datepicker.css'
 
 class App extends Component {
   constructor(props) {
@@ -23,6 +26,7 @@ class App extends Component {
     this.buy = this.buy.bind(this)
     this.withdraw = this.withdraw.bind(this)
     this.updateListingAmount = this.updateListingAmount.bind(this)
+    this.updateForSaleDate = this.updateForSaleDate.bind(this)
     this.destory = this.destory.bind(this)
     this.renderContract = this.renderContract.bind(this)
     this.renderNoContract = this.renderNoContract.bind(this)
@@ -40,7 +44,8 @@ class App extends Component {
       artistName: '',
       artist: '',
       createdYear: 0,
-      forSaleDate: 0,
+      forSaleDate: parseInt(new Date().getTime() / 1000, 10), // now
+      forSaleDateMoment: moment(), // now, with moment
       forSale: false,
       artistHasSigned: false,
       ipfsBase: '//ipfs.io/ipfs/',
@@ -194,7 +199,8 @@ class App extends Component {
   listForSale(evt) {
     evt.preventDefault()
     const value = this.state.newListingPrice
-    const date = parseInt(new Date().getTime() / 1000, 10)
+    let date = this.state.forSaleDate
+    if (date === 0) date = parseInt(new Date().getTime() / 1000, 10) // now
     this.state.instance.listWorkForSale(value, date, {from: this.state.account}).then((tx) => {
       const transactions = this.state.transactions.slice()
       transactions.push(tx.tx)
@@ -251,6 +257,13 @@ class App extends Component {
     const ether = event.target.value
     const newListingPrice = this.state.web3.toWei(ether, 'ether');
     this.setState({newListingPrice})
+  }
+
+  updateForSaleDate(date) {
+    this.setState({
+      forSaleDateMoment: date,
+      forSaleDate: date.format('X')
+    });
   }
 
   renderProvenence() {
@@ -312,6 +325,7 @@ class App extends Component {
   }
 
   renderArtwork(isOwner) {
+    if (!this.state.artThumbHash) return
     const thumbnail = this.state.ipfsBase + this.state.artThumbHash
     const artwork = this.state.ipfsBase + this.state.artHash
 
@@ -339,6 +353,16 @@ class App extends Component {
     if (isOwner && isContractOwner) identity = 'You are the contract owner & owner of this artwork'
     if (isArtist && isOwner && isContractOwner) identity = 'You are the contract owner & artist & owner of this artwork'
 
+    const now = parseInt(new Date().getTime() / 1000, 10)
+    const forSaleInFuture = this.state.forSaleDate > now
+    let forSaleString = ''
+    if (forSaleInFuture) {
+      const day = moment(this.state.forSaleDate * 1000).format('MMMM Do, Y')
+      const time = moment(this.state.forSaleDate * 1000).format('h:mm a')
+      forSaleString = `${day} at ${time} in your local timezone.`
+    }
+
+
     return (
         <div>
           {identity && (
@@ -355,9 +379,16 @@ class App extends Component {
           <div>
             <em>
               {this.state.forSale
-                ? <span>This work is for sale: {saleAmount} ETH</span>
+                ? <span>This work is for sale for {saleAmount} ETH</span>
                 : <span>This work is not for sale</span>
               }
+            </em>
+          </div>
+          <div>
+            <em>
+              {this.state.forSale && forSaleInFuture && (
+                <span>This work will be available for sale at {forSaleString}</span>
+              )}
             </em>
           </div>
           <div>
@@ -378,8 +409,17 @@ class App extends Component {
             : <span/>
           }
 
-          {isOwner && !this.state.forSale && this.state.artistHasSigned
-            ? (
+          {isOwner && !this.state.forSale && this.state.artistHasSigned && (
+            <div>
+              <div>
+                <label htmlFor="forSaleDate">Set for sale date</label>
+                <DatePicker
+                  selected={this.state.forSaleDateMoment}
+                  onChange={this.updateForSaleDate}
+                  value={this.forSaleDateMoment}
+                  showTimeSelect
+                  dateFormat="LLL" />
+              </div>
               <div>
                 <label htmlFor="listingAmount">Amount (ETH)</label>
                 <input
@@ -390,9 +430,8 @@ class App extends Component {
                 />
                 <span><a className="pure-button" onClick={this.listForSale}>List for sale</a></span>
               </div>
-              )
-            : <span/>
-          }
+            </div>
+          )}
 
           {isOwner && this.state.forSale
             ? (
@@ -403,15 +442,12 @@ class App extends Component {
             : <span/>
           }
 
-          {this.state.forSale && (!isArtist || !isOwner)
-            ? (
-              <div>
-                <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
-                <span>{saleAmount} ETH</span>
-              </div>
-              )
-            : <span/>
-          }
+          {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && (
+            <div>
+              <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
+              <span>{saleAmount} ETH</span>
+            </div>
+          )}
 
           {isContractOwner
             ? (
