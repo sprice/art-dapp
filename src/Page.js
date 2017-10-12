@@ -350,7 +350,7 @@ class App extends Component {
           <h1>{this.state.title}</h1>
           <h2>{this.state.artistName}, {this.state.createdYear}</h2>
           <div className="description">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentum nulla eu odio semper malesuada. Sed non ex elit. Maecenas quis massa sagittis, gravida odio ut, ultrices tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam iaculis augue in convallis congue. Etiam cursus malesuada sapien eu rutrum.</p>
+            <p></p>
           </div>
           <div>
             <em>
