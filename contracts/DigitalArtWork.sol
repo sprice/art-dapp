@@ -41,13 +41,19 @@ contract DigitalArtWork {
     /// title is the name of the artwork.
     string public title;
 
+    /// title is the description of the artwork.
+    /// Need to implement
+    string public description;
+
     /// artistName is the artwork's artist name.
     string public artistName;
 
     /// artistKeybase is the artists Keybase.io username
+    /// Need to implement
     string public artistKeybase;
 
     /// artistDoc is an IPFS file hash of a crypto signed text file (eth address, artist statement)
+    /// Need to implement
     string public artistDocHash;
 
     /// artist is the artwork's artist wallet.
