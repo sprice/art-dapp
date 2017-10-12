@@ -325,7 +325,7 @@ class App extends Component {
   }
 
   renderArtwork(isOwner) {
-    if (!this.state.artThumbHash) return
+    if (!this.state.artThumbHash || !this.state.artHash) return
     const thumbnail = this.state.ipfsBase + this.state.artThumbHash
     const artwork = this.state.ipfsBase + this.state.artHash
 
