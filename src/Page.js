@@ -59,7 +59,8 @@ class App extends Component {
       numSales: 0,
       provenence: [],
       transactions:[],
-      emptyCellMarker: '-'
+      emptyCellMarker: '-',
+      etherscanBase: '//etherscan.io'
     }
   }
 
@@ -78,6 +79,8 @@ class App extends Component {
       return getNetwork(this.state.web3)
     }).then((network) => {
       const {name, id, etherscan} = network
+      if (name === 'rinkeby') this.setState({etherscanBase: '//rinkeby.etherscan.io'})
+      if (name === 'unknown') this.setState({etherscanBase: '//unknown.etherscan.io'})
       this.setState({
         networkName: name,
         networkId: id,
@@ -363,6 +366,8 @@ class App extends Component {
       forSaleString = `${day} at ${time} in your local timezone.`
     }
 
+    const contractId = getContract(this.state.networkName, this.state.pageId)
+    const contractLink = `${this.state.etherscanBase}/address/${contractId}#code`
 
     return (
         <div>
@@ -374,6 +379,7 @@ class App extends Component {
           )}
           <h1>{this.state.title}</h1>
           <h2>{this.state.artistName}, {this.state.createdYear}</h2>
+          <p><a href={contractLink} target="_blank">View Contract</a></p>
           <div className="description">
             <p></p>
           </div>

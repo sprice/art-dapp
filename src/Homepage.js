@@ -45,7 +45,7 @@ class Homepage extends Component {
               <h1 className="center title">Introducing True Ownership Of Digital Fine Art</h1>
               <div className="info">
                 <h2>For Collectors</h2>
-                <p>Start your collection of unique and rare digital art. Display art on your favourite devices.</p>
+                <p>Build your collection of unique and rare digital art. Display art on your favourite devices.</p>
               </div>
               <div className="info">
                 <h2>For Artists</h2>
