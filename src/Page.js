@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import DatePicker from 'react-datepicker'
+import Loader from 'react-loader'
 import moment from 'moment'
 import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import getWeb3 from './utils/getWeb3'
@@ -33,6 +34,7 @@ class App extends Component {
     this.renderArtwork = this.renderArtwork.bind(this)
 
     this.state = {
+      loaded: false,
       web3: null,
       contractOwner: '',
       owner: '',
@@ -130,12 +132,14 @@ class App extends Component {
             return resolve()
           }).catch((err) => {
             this.setState({
+              loaded: true,
               contractLoaded: false
             })
             return reject(err)
           })
         } else {
           this.setState({
+            loaded: true,
             contractLoaded: false
           })
           return resolve()
@@ -182,6 +186,7 @@ class App extends Component {
           }
         })
       }
+      if (i === (DigitalArtWork.abi.length - 1)) setTimeout(() => {this.setState({loaded: true})}, 500)
     }
   }
 
@@ -379,7 +384,9 @@ class App extends Component {
           )}
           <h1>{this.state.title}</h1>
           <h2>{this.state.artistName}, {this.state.createdYear}</h2>
-          <p><a href={contractLink} target="_blank">View Contract</a></p>
+          <p>
+            <a href={contractLink} target="_blank" className="pure-button pure-button-primary button-xsmall">View Contract</a>
+          </p>
           <div className="description">
             <p></p>
           </div>
@@ -476,41 +483,43 @@ class App extends Component {
   render() {
 
     return (
-      <div className="app">
-        <div className="primary">
-          <nav className="navbar pure-menu pure-menu-horizontal">
-            <div className="">
-              <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-            </div>
-            <div className="">
-              <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-            </div>
-          </nav>
-          <div className="pure-g">
-            <div className="pure-u-1-1">
-                {this.state.contractLoaded
-                  ? this.renderContract()
-                  : this.renderNoContract()
-                }
-            </div>
-            <div className="pure-u-1-1">
-              {(this.state.transactions.length > 0) && this.renderTransactions()}
-            </div>
-            <div className="pure-u-1-1">
-              {(this.state.provenence.length > 0) && this.renderProvenence()}
-            </div>
-          </div>
-        </div>
-        <div className="secondary">
-          <div className="frame-wrap">
-            {this.state.contractLoaded && (
-              <div className="frame">
-                  {this.renderArtwork()}
+      <Loader loaded={this.state.loaded}>
+        <div className="app">
+          <div className="primary">
+            <nav className="navbar pure-menu pure-menu-horizontal">
+              <div className="">
+                <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
               </div>
-            )}
+              <div className="">
+                <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
+              </div>
+            </nav>
+            <div className="pure-g">
+              <div className="pure-u-1-1">
+                  {this.state.contractLoaded
+                    ? this.renderContract()
+                    : this.renderNoContract()
+                  }
+              </div>
+              <div className="pure-u-1-1">
+                {(this.state.transactions.length > 0) && this.renderTransactions()}
+              </div>
+              <div className="pure-u-1-1">
+                {(this.state.provenence.length > 0) && this.renderProvenence()}
+              </div>
+            </div>
+          </div>
+          <div className="secondary">
+            <div className="frame-wrap">
+              {this.state.contractLoaded && (
+                <div className="frame">
+                    {this.renderArtwork()}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      </Loader>
     )
   }
 }

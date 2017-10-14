@@ -21,7 +21,11 @@ h2 {
   font-size: 2em;
 }
 
-a,
+.button-xsmall {
+  font-size: 70%;
+}
+
+/*a,
 a:visited {
   color: blue;
   text-decoration: none;
@@ -30,7 +34,7 @@ a:active,
 a:focus,
 a:hover {
   color: black;
-}
+}*/
 
 .info {
   text-align: center;
