@@ -1,4 +1,4 @@
-pragma solidity 0.4.15;
+pragma solidity 0.4.17;
 
 contract DigitalArtWork {
 
@@ -115,7 +115,8 @@ contract DigitalArtWork {
                             string _artistName,
                             uint _createdYear,
                             address _artist,
-                            address _withdrawAddress) {
+                            address _withdrawAddress)
+    public {
 
         if (bytes(_artThumbHash).length == 0) revert();
         if (bytes(_artHash).length == 0) revert();
@@ -148,7 +149,7 @@ contract DigitalArtWork {
     }
 
     /// If an artwork is for sale, process the purchase.
-    function buy() payable returns (bool) {
+    function buy() public payable returns (bool) {
         if (forSale != true) revert();
         if (artistHasSigned != true) revert();
         if (msg.value < listingPrice) revert();
@@ -228,18 +229,18 @@ contract DigitalArtWork {
     }
 
     /// getSalesNum returns the number of purchases.
-    function getSalesNum() constant returns (uint) {
+    function getSalesNum() public constant returns (uint) {
         return provenence.length;
     }
 
     /// withdraw allows the contract owner to transfer out the contract balance.
-    function withdraw()
+    function withdraw() public
     onlyContractOwner() {
         withdrawAddress.transfer(this.balance);
     }
 
     /// Used for development. Remove for deployment.
-    function destroy()
+    function destroy() public
     onlyContractOwner() {
         selfdestruct(withdrawAddress);
     }
