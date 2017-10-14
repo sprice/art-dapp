@@ -86,9 +86,8 @@ contract DigitalArtWorkEditions {
         /// forSale flags whether the artwork is for sale.
         bool forSale;
 
-        // TODO
         /// provenence is an array of all artwork purchases.
-        /// Provenence[] public provenence;
+        Provenence[] provenence;
     }
 
     /// editions is an array of all the artwork editions.
@@ -164,14 +163,34 @@ contract DigitalArtWorkEditions {
                 owner: _artist,
                 listingPrice: 0,
                 forSaleDate: 0,
-                forSale: false
+                forSale: false,
+                provenence: Provenence({
+                    owner: artist,
+                    purchaseAmount: 0,
+                    purchaseDate: now
+                })
             }));
         }        
     }
 
-    /// getEdition returns edition specific info.
-    function getEdition(uint i) public constant returns (Edition) {
-        return editions[i];
+    /// getEditionOwner returns the owner of an edition.
+    function getEditionOwner(uint i) public constant returns (address) {
+        return editions[i].owner;
+    }
+
+    /// getEditionListingPrice returns the listing price of an edition.
+    function getEditionListingPrice(uint i) public constant returns (uint256) {
+        return editions[i].listingPrice;
+    }
+
+    /// getEditionForSaleDate returns the for sale date of an edition.
+    function getEditionForSaleDate(uint i) public constant returns (uint) {
+        return editions[i].forSaleDate;
+    }
+
+    /// getEditionForSale returns whether an edition is for sale.
+    function getEditionForSale(uint i) public constant returns (bool) {
+        return editions[i].forSale;
     }
 
     /// If an artwork is for sale, process the purchase.
@@ -204,12 +223,11 @@ contract DigitalArtWorkEditions {
         // Change ownership
         editions[numEdition].owner = msg.sender;
 
-        // TODO
-        // editions[numEdition].provenence.push(Provenence({
-        //     owner: editions[numEdition].owner,
-        //     purchaseAmount: msg.value,
-        //     purchaseDate: now
-        // }));
+        editions[numEdition].provenence.push(Provenence({
+            owner: editions[numEdition].owner,
+            purchaseAmount: msg.value,
+            purchaseDate: now
+        }));
 
         LogPurchase(msg.sender, msg.value, numEdition);
 
@@ -257,9 +275,7 @@ contract DigitalArtWorkEditions {
 
     /// getSalesNum returns the number of purchases.
     function getSalesNum(uint numEdition) public constant returns (uint) {
-        return numEdition;
-        // TODO
-        // return editions[numEdition].provenence.length;
+        return editions[numEdition].provenence.length;
     }
 
     /// withdraw allows the contract owner to transfer out the contract balance.
