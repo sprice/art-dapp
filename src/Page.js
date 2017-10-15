@@ -68,11 +68,16 @@ class App extends Component {
       transactions:[],
       emptyCellMarker: '-',
       etherscanBase: '//etherscan.io',
-      numEditions: 0
+      numEditions: 0,
+      location: ''
     }
   }
 
   componentWillMount() {
+    let location = String(window.location)
+    const last = location.substr(-1)
+    if (last === '/') location = location.substr(0, location.length-1);
+    this.setState({location})
     this.loadWeb3()
   }
 
@@ -303,7 +308,7 @@ class App extends Component {
 
   selectEdition(event) {
     const edition = parseInt(event.target.value, 10) + 1
-    window.location.href = window.location + edition
+    window.location.href = this.state.location + '/' + edition
   }
 
   renderProvenence() {
