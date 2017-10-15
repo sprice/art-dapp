@@ -35,6 +35,8 @@ class App extends Component {
     this.renderEdition = this.renderEdition.bind(this)
     this.renderChooseEdition = this.renderChooseEdition.bind(this)
     this.selectEdition = this.selectEdition.bind(this)
+    this.renderBuyEditionButton = this.renderBuyEditionButton.bind(this)
+    this.navigateToEdition = this.navigateToEdition.bind(this)
 
     this.state = {
       loaded: false,
@@ -63,13 +65,16 @@ class App extends Component {
       networkId: 0,
       artworkId: props.match.params.id - 1,
       editionId: (props.match.params.editionId || 1) - 1,
+      isEdition: !!props.match.params.editionId,
       numSales: 0,
       provenence: [],
       transactions:[],
       emptyCellMarker: '-',
       etherscanBase: '//etherscan.io',
       numEditions: 0,
-      location: ''
+      location: '',
+      cheapestEdition: 0,
+      cheapestEditionAmount: 0
     }
   }
 
@@ -177,45 +182,54 @@ class App extends Component {
           numEditions: value[7].toNumber(),
           artistHasSigned: value[8]
         }, () => {
-          this.state.instance['getEdition'].call(this.state.artworkId, this.state.editionId).then((value) => {
-            // The requested edition for this artwork does not exist.
-            // state.artworkLoaded is currently false.
-            if (value[0] === '0x0000000000000000000000000000000000000000') {
-              this.setState({
-                loaded: true
-              })
-            }
-            else {
-              this.setState({
-                owner: value[0],
-                listingPrice: value[1].toNumber(),
-                forSaleDate: value[2].toNumber(),
-                forSale: value[3],
-                artworkLoaded: true
-              }, () => {
-                this.state.instance['contractOwner'].call().then((value) => {
+          this.state.instance['getCheapestEditionForSale'].call(this.state.artworkId).then((value) => {
+            const cheapestEdition = value[0].toNumber()
+            const cheapestEditionAmount = value[1].toNumber()
+            this.setState({
+              cheapestEdition,
+              cheapestEditionAmount
+            }, () => {
+              this.state.instance['getEdition'].call(this.state.artworkId, this.state.editionId).then((value) => {
+                // The requested edition for this artwork does not exist.
+                // state.artworkLoaded is currently false.
+                if (value[0] === '0x0000000000000000000000000000000000000000') {
                   this.setState({
-                    contractOwner: value,
                     loaded: true
+                  })
+                }
+                else {
+                  this.setState({
+                    owner: value[0],
+                    listingPrice: value[1].toNumber(),
+                    forSaleDate: value[2].toNumber(),
+                    forSale: value[3],
+                    artworkLoaded: true
                   }, () => {
-                    this.state.instance['getSalesNum'].call(this.state.artworkId, this.state.editionId).then((value) => {
-                      const provenenceLength = value.toNumber()
-                      let provenence = []
-                      for (let i = 0; i < provenenceLength; i++) {
-                        this.state.instance['getProvenence'].call(this.state.artworkId, this.state.editionId, i).then((value) => {
-                          provenence.push({
-                            address: value[0],
-                            amount: value[1].toNumber(),
-                            date: value[2].toNumber()
-                          })
-                          if (i === (provenenceLength - 1)) this.setProvenence(provenence)
+                    this.state.instance['contractOwner'].call().then((value) => {
+                      this.setState({
+                        contractOwner: value,
+                        loaded: true
+                      }, () => {
+                        this.state.instance['getSalesNum'].call(this.state.artworkId, this.state.editionId).then((value) => {
+                          const provenenceLength = value.toNumber()
+                          let provenence = []
+                          for (let i = 0; i < provenenceLength; i++) {
+                            this.state.instance['getProvenence'].call(this.state.artworkId, this.state.editionId, i).then((value) => {
+                              provenence.push({
+                                address: value[0],
+                                amount: value[1].toNumber(),
+                                date: value[2].toNumber()
+                              })
+                              if (i === (provenenceLength - 1)) this.setProvenence(provenence)
+                            })
+                          }
                         })
-                      }
+                      })
                     })
                   })
-                })
+                }
               })
-            }
+            })
           })
         })
       }
@@ -311,6 +325,21 @@ class App extends Component {
     window.location.href = this.state.location + '/' + edition
   }
 
+  navigateToEdition(event) {
+    event.preventDefault()
+    window.location.href = this.state.location + '/' + this.state.cheapestEdition
+
+  }
+
+  renderBuyEditionButton() {
+    const buyText = `Buy from ${this.state.web3.fromWei(this.state.cheapestEditionAmount, 'ether')} ETH`
+    return (
+        <p>
+          <a href="#" onClick={this.navigateToEdition} className="button-small pure-button pure-button-primary">{buyText}</a>
+        </p>
+    )
+  }
+
   renderProvenence() {
     return (
       <div>
@@ -389,7 +418,8 @@ class App extends Component {
   }
 
   renderContract() {
-    const titleHref = `/a/${this.state.artworkId}`
+    const titleHref = `/a/${this.state.artworkId + 1}`
+
     return (
       <div>
         <h1><a href={titleHref}>{this.state.title}</a></h1>
@@ -398,10 +428,15 @@ class App extends Component {
           <p>{this.state.description}</p>
         </div>
         <div>
-          {(this.state.numEditions === 1) || this.state.editionId > 0
+          {(this.state.numEditions === 1) || this.state.isEdition
             ? this.renderEdition()
             : this.renderChooseEdition()
           }
+        </div>
+        <div>
+          {!this.state.isEdition && !!this.state.cheapestEdition && (
+            this.renderBuyEditionButton()
+          )}
         </div>
       </div>
     )

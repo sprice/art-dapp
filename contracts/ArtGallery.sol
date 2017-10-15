@@ -187,6 +187,33 @@ contract ArtGallery {
         );
     }
 
+    /// getCheapestEditionForSale returns the ediiton for sale for the least amount of all editions.
+    /// Note: Returns the edition number, not the index number.
+    function getCheapestEditionForSale(uint numArtwork) public constant returns (uint, uint256) {
+        if (numArtwork < 0) revert();
+        uint cheapestEdition = 0;
+        uint256 cheapestAmount = 0;
+        bool foundFirst = false;
+        for(uint i=0; i<artworks[numArtwork].numEditions; i++) {
+            if (artworks[numArtwork].editions[i].forSale) {
+                if (!foundFirst) {
+                    cheapestEdition = i;
+                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
+                    foundFirst = true;
+                }
+                if (artworks[numArtwork].editions[i].listingPrice < cheapestAmount) {
+                    cheapestEdition = i;
+                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
+                }
+            }
+        }
+        if (cheapestAmount > 0) {
+            return (cheapestEdition + 1, cheapestAmount);
+        } else {
+            return (0, 0);
+        }
+    }
+
     /// getProvenence returns the edition specific artwork details.
     function getProvenence(uint numArtwork, uint numEdition, uint provenenceId) public constant returns (address, uint256, uint) {
         if (numArtwork < 0) revert();
