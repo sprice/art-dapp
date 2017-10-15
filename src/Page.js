@@ -32,6 +32,9 @@ class App extends Component {
     this.renderContract = this.renderContract.bind(this)
     this.renderNoContract = this.renderNoContract.bind(this)
     this.renderArtwork = this.renderArtwork.bind(this)
+    this.renderEdition = this.renderEdition.bind(this)
+    this.renderChooseEdition = this.renderChooseEdition.bind(this)
+    this.selectEdition = this.selectEdition.bind(this)
 
     this.state = {
       loaded: false,
@@ -59,7 +62,7 @@ class App extends Component {
       networkName: '',
       networkId: 0,
       artworkId: props.match.params.id - 1,
-      editionId: 1 - 1,
+      editionId: (props.match.params.editionId || 1) - 1,
       numSales: 0,
       provenence: [],
       transactions:[],
@@ -154,8 +157,8 @@ class App extends Component {
   updateState() {
     this.state.instance['artworks'].call(this.state.artworkId).then((value) => {
       // Artwork ID does not exist.
-      // state.artworkLoaded is currently false
-      if (value[0] === '0x0000000000000000000000000000000000000000'){
+      // state.artworkLoaded is currently false.
+      if (value[0] === '0x0000000000000000000000000000000000000000') {
         this.setState({loaded: true})
       } else {
         this.setState({
@@ -167,38 +170,47 @@ class App extends Component {
           artThumbHash: value[5],
           artHash: value[6],
           numEditions: value[7].toNumber(),
-          artistHasSigned: value[8],
-          artworkLoaded: true
+          artistHasSigned: value[8]
         }, () => {
           this.state.instance['getEdition'].call(this.state.artworkId, this.state.editionId).then((value) => {
-            this.setState({
-              owner: value[0],
-              listingPrice: value[1].toNumber(),
-              forSaleDate: value[2].toNumber(),
-              forSale: value[3]
-            }, () => {
-              this.state.instance['contractOwner'].call().then((value) => {
-                this.setState({
-                  contractOwner: value,
-                  loaded: true
-                }, () => {
-                  this.state.instance['getSalesNum'].call(this.state.artworkId, this.state.editionId).then((value) => {
-                    const provenenceLength = value.toNumber()
-                    let provenence = []
-                    for (let i = 0; i < provenenceLength; i++) {
-                      this.state.instance['getProvenence'].call(this.state.artworkId, this.state.editionId, i).then((value) => {
-                        provenence.push({
-                          address: value[0],
-                          amount: value[1].toNumber(),
-                          date: value[2].toNumber()
+            // The requested edition for this artwork does not exist.
+            // state.artworkLoaded is currently false.
+            if (value[0] === '0x0000000000000000000000000000000000000000') {
+              this.setState({
+                loaded: true
+              })
+            }
+            else {
+              this.setState({
+                owner: value[0],
+                listingPrice: value[1].toNumber(),
+                forSaleDate: value[2].toNumber(),
+                forSale: value[3],
+                artworkLoaded: true
+              }, () => {
+                this.state.instance['contractOwner'].call().then((value) => {
+                  this.setState({
+                    contractOwner: value,
+                    loaded: true
+                  }, () => {
+                    this.state.instance['getSalesNum'].call(this.state.artworkId, this.state.editionId).then((value) => {
+                      const provenenceLength = value.toNumber()
+                      let provenence = []
+                      for (let i = 0; i < provenenceLength; i++) {
+                        this.state.instance['getProvenence'].call(this.state.artworkId, this.state.editionId, i).then((value) => {
+                          provenence.push({
+                            address: value[0],
+                            amount: value[1].toNumber(),
+                            date: value[2].toNumber()
+                          })
+                          if (i === (provenenceLength - 1)) this.setProvenence(provenence)
                         })
-                        if (i === (provenenceLength - 1)) this.setProvenence(provenence)
-                      })
-                    }
+                      }
+                    })
                   })
                 })
               })
-            })
+            }
           })
         })
       }
@@ -289,6 +301,11 @@ class App extends Component {
     });
   }
 
+  selectEdition(event) {
+    const edition = parseInt(event.target.value, 10) + 1
+    window.location.href = window.location + edition
+  }
+
   renderProvenence() {
     return (
       <div>
@@ -367,7 +384,44 @@ class App extends Component {
   }
 
   renderContract() {
+    const titleHref = `/a/${this.state.artworkId}`
+    return (
+      <div>
+        <h1><a href={titleHref}>{this.state.title}</a></h1>
+        <h2>{this.state.artistName}, {this.state.createdYear}</h2>
+        <div className="description">
+          <p>{this.state.description}</p>
+        </div>
+        <div>
+          {(this.state.numEditions === 1) || this.state.editionId > 0
+            ? this.renderEdition()
+            : this.renderChooseEdition()
+          }
+        </div>
+      </div>
+    )
+  }
 
+  renderChooseEdition() {
+    let options = []
+    options.push(<option key={-1}>Choose an edition</option>)
+    for (let i = 0; i < this.state.numEditions; i++) {
+      options.push(<option value={i} key={i}>{i + 1}</option>)
+    }
+    return (
+      <div>
+        <label htmlFor='editions'>Choose edition</label>
+        <select
+          id='editions'
+          onChange={this.selectEdition}
+        >
+          {options}
+        </select>
+      </div>
+    )
+  }
+
+  renderEdition() {
     const isArtist = this.state.account === this.state.artist
     const isOwner = this.state.account === this.state.owner
     const isContractOwner = this.state.account === this.state.contractOwner
@@ -393,106 +447,101 @@ class App extends Component {
     }
 
     return (
+    <div>
+      {identity && (
+        <h4><em>{identity}</em> 😁</h4>
+      )}
+      {isOwner && (
+        <ChromecastButton hash={this.state.artHash} />
+      )}
+      <div>
+        <em>
+          {this.state.forSale
+            ? <span>This work is for sale for {saleAmount} ETH</span>
+            : <span>This work is not for sale</span>
+          }
+        </em>
+      </div>
+      <div>
+        <em>
+          {this.state.forSale && forSaleInFuture && (
+            <span>This work will be available for sale at {forSaleString}</span>
+          )}
+        </em>
+      </div>
+      <div>
+        <em>
+          {this.state.artistHasSigned
+            ? <span>This work is signed by the artist</span>
+            : <span>This work has not yet been signed by the artist</span>
+          }
+        </em>
+      </div>
+
+      {isArtist && !this.state.artistHasSigned
+        ? (
+          <div>
+            <span><a className="pure-button" onClick={this.sign}>Sign Art</a></span>
+          </div>
+          )
+        : <span/>
+      }
+
+      {isOwner && !this.state.forSale && this.state.artistHasSigned && (
         <div>
-          {identity && (
-            <h4><em>{identity}</em> 😁</h4>
-          )}
-          {isOwner && (
-            <ChromecastButton hash={this.state.artHash} />
-          )}
-          <h1>{this.state.title}</h1>
-          <h2>{this.state.artistName}, {this.state.createdYear}</h2>
-          <div className="description">
-            <p>{this.state.description}</p>
+          <div>
+            <label htmlFor="forSaleDate">Set for sale date</label>
+            <DatePicker
+              selected={this.state.forSaleDateMoment}
+              onChange={this.updateForSaleDate}
+              value={this.forSaleDateMoment}
+              showTimeSelect
+              dateFormat="LLL" />
           </div>
           <div>
-            <em>
-              {this.state.forSale
-                ? <span>This work is for sale for {saleAmount} ETH</span>
-                : <span>This work is not for sale</span>
-              }
-            </em>
+            <label htmlFor="listingAmount">Amount (ETH)</label>
+            <input
+              id="listingAmount"
+              type="number"
+              placeholder="ETH"
+              onChange={this.updateListingAmount}
+            />
+            <span><a className="pure-button" onClick={this.listForSale}>List for sale</a></span>
           </div>
-          <div>
-            <em>
-              {this.state.forSale && forSaleInFuture && (
-                <span>This work will be available for sale at {forSaleString}</span>
-              )}
-            </em>
-          </div>
-          <div>
-            <em>
-              {this.state.artistHasSigned
-                ? <span>This work is signed by the artist</span>
-                : <span>This work has not yet been signed by the artist</span>
-              }
-            </em>
-          </div>
-
-          {isArtist && !this.state.artistHasSigned
-            ? (
-              <div>
-                <span><a className="pure-button" onClick={this.sign}>Sign Art</a></span>
-              </div>
-              )
-            : <span/>
-          }
-
-          {isOwner && !this.state.forSale && this.state.artistHasSigned && (
-            <div>
-              <div>
-                <label htmlFor="forSaleDate">Set for sale date</label>
-                <DatePicker
-                  selected={this.state.forSaleDateMoment}
-                  onChange={this.updateForSaleDate}
-                  value={this.forSaleDateMoment}
-                  showTimeSelect
-                  dateFormat="LLL" />
-              </div>
-              <div>
-                <label htmlFor="listingAmount">Amount (ETH)</label>
-                <input
-                  id="listingAmount"
-                  type="number"
-                  placeholder="ETH"
-                  onChange={this.updateListingAmount}
-                />
-                <span><a className="pure-button" onClick={this.listForSale}>List for sale</a></span>
-              </div>
-            </div>
-          )}
-
-          {isOwner && this.state.forSale
-            ? (
-              <div>
-                <span><a className="pure-button" onClick={this.unlist}>Unlist from sale</a></span>
-              </div>
-            )
-            : <span/>
-          }
-
-          {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && (
-            <div>
-              <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
-              <span>{saleAmount} ETH</span>
-            </div>
-          )}
-
-          {isContractOwner
-            ? (
-              <div>
-                <div>
-                  <span><a className="pure-button" onClick={this.withdraw}>Withdraw</a></span>
-                </div>
-                <div>
-                  <span><a className="pure-button" onClick={this.destory}>Destory</a></span>
-                </div>
-              </div>
-              )
-            : <span/>
-          }
         </div>
-    );
+      )}
+
+      {isOwner && this.state.forSale
+        ? (
+          <div>
+            <span><a className="pure-button" onClick={this.unlist}>Unlist from sale</a></span>
+          </div>
+        )
+        : <span/>
+      }
+
+      {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && (
+        <div>
+          <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
+          <span>{saleAmount} ETH</span>
+        </div>
+      )}
+
+      {isContractOwner
+        ? (
+          <div>
+            <div>
+              <span><a className="pure-button" onClick={this.withdraw}>Withdraw</a></span>
+            </div>
+            <div>
+              <span><a className="pure-button" onClick={this.destory}>Destory</a></span>
+            </div>
+          </div>
+          )
+        : <span/>
+      }
+    </div>
+    )
   }
 
   render() {
@@ -528,7 +577,7 @@ class App extends Component {
           </div>
           <div className="secondary">
             <div className="frame-wrap">
-              {this.state.contractLoaded && (
+              {this.state.contractLoaded && this.state.artworkLoaded && (
                 <div className="frame">
                     {this.renderArtwork()}
                 </div>
