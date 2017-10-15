@@ -5,6 +5,7 @@ migrations
 node_modules
 scripts
 src
+tasks
 test
 app.js
 truffle.js

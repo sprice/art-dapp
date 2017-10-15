@@ -175,6 +175,18 @@ contract ArtGallery {
         numArtworks += 1;
     }
 
+    function getEdition(uint numArtwork, uint numEdition) public constant returns (address, uint256, uint, bool) {
+        if (numArtwork < 0) revert();
+        if (numEdition < 0) revert();
+        return (
+            artworks[numArtwork].editions[numEdition].owner,
+            artworks[numArtwork].editions[numEdition].listingPrice,
+            artworks[numArtwork].editions[numEdition].forSaleDate,
+            artworks[numArtwork].editions[numEdition].forSale
+
+        );
+    }
+
     /// If an artwork is for sale, process the purchase.
     function buy(uint numArtwork, uint numEdition) public payable returns (bool) {
         if (numArtwork < 0) revert();
