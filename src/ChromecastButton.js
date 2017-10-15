@@ -106,7 +106,7 @@ class ChromecastButton extends Component {
 
     render() {
         return (
-            <h5><a href="#" onClick={this.sendCast}>Cast artwork</a></h5>
+            <h5><a href="#" onClick={this.sendCast} className="button-small pure-button pure-button-primary">Cast artwork</a></h5>
         )
     }
 }
