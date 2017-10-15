@@ -175,6 +175,7 @@ contract ArtGallery {
         numArtworks += 1;
     }
 
+    /// getEdition returns the edition specific artwork details.
     function getEdition(uint numArtwork, uint numEdition) public constant returns (address, uint256, uint, bool) {
         if (numArtwork < 0) revert();
         if (numEdition < 0) revert();
@@ -183,7 +184,18 @@ contract ArtGallery {
             artworks[numArtwork].editions[numEdition].listingPrice,
             artworks[numArtwork].editions[numEdition].forSaleDate,
             artworks[numArtwork].editions[numEdition].forSale
+        );
+    }
 
+    /// getProvenence returns the edition specific artwork details.
+    function getProvenence(uint numArtwork, uint numEdition, uint provenenceId) public constant returns (address, uint256, uint) {
+        if (numArtwork < 0) revert();
+        if (numEdition < 0) revert();
+        if (provenenceId < 0) revert();
+        return (
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].owner,
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseAmount,
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseDate
         );
     }
 

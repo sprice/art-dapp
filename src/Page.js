@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import DatePicker from 'react-datepicker'
 import Loader from 'react-loader'
 import moment from 'moment'
-import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
 import ArtGallery from '../build/contracts/ArtGallery.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
@@ -155,6 +154,7 @@ class App extends Component {
   updateState() {
     this.state.instance['artworks'].call(this.state.artworkId).then((value) => {
       // Artwork ID does not exist.
+      // state.artworkLoaded is currently false
       if (value[0] === '0x0000000000000000000000000000000000000000'){
         this.setState({loaded: true})
       } else {
@@ -170,7 +170,7 @@ class App extends Component {
           artistHasSigned: value[8],
           artworkLoaded: true
         }, () => {
-          this.state.instance['getEdition'].call(this.state.artworkId, 0).then((value) => {
+          this.state.instance['getEdition'].call(this.state.artworkId, this.state.editionId).then((value) => {
             this.setState({
               owner: value[0],
               listingPrice: value[1].toNumber(),
@@ -181,6 +181,21 @@ class App extends Component {
                 this.setState({
                   contractOwner: value,
                   loaded: true
+                }, () => {
+                  this.state.instance['getSalesNum'].call(this.state.artworkId, this.state.editionId).then((value) => {
+                    const provenenceLength = value.toNumber()
+                    let provenence = []
+                    for (let i = 0; i < provenenceLength; i++) {
+                      this.state.instance['getProvenence'].call(this.state.artworkId, this.state.editionId, i).then((value) => {
+                        provenence.push({
+                          address: value[0],
+                          amount: value[1].toNumber(),
+                          date: value[2].toNumber()
+                        })
+                        if (i === (provenenceLength - 1)) this.setProvenence(provenence)
+                      })
+                    }
+                  })
                 })
               })
             })
@@ -188,48 +203,6 @@ class App extends Component {
         })
       }
     })
-  }
-
-  updateState____() {
-    this.setState({contractLoaded: true})
-    for (let i = 0; i < DigitalArtWork.abi.length; i++) {
-      let instance = DigitalArtWork.abi[i]
-      let key = DigitalArtWork.abi[i].name
-      if (instance.constant === true &&
-          instance.inputs.length === 0 &&
-          instance.payable === false &&
-          instance.type === 'function') {
-            this.state.instance[key].call().then((value) => {
-              let inState = this.state.hasOwnProperty(key)
-              if (inState) {
-                let isBigNumber = typeof value === 'object' && typeof value.toNumber === 'function'
-
-                let newState = {}
-
-                if (isBigNumber) newState[key] = value.toNumber()
-                else newState[key] = value
-                this.setState(newState)
-              }
-            })
-      }
-      if (instance.name === 'getSalesNum') {
-        this.state.instance[key].call().then((value) => {
-          const provenenceLength = value.toNumber()
-          let provenence = []
-          for (let i = 0; i < provenenceLength; i++) {
-            this.state.instance['provenence'].call(i).then((value) => {
-              provenence.push({
-                address: value[0],
-                amount: value[1].toNumber(),
-                date: value[2].toNumber()
-              })
-              if (i === (provenenceLength - 1)) this.setProvenence(provenence)
-            })
-          }
-        })
-      }
-      if (i === (DigitalArtWork.abi.length - 1)) setTimeout(() => {this.setState({loaded: true})}, 500)
-    }
   }
 
   setProvenence(provenence) {
@@ -430,7 +403,7 @@ class App extends Component {
           <h1>{this.state.title}</h1>
           <h2>{this.state.artistName}, {this.state.createdYear}</h2>
           <div className="description">
-            <p></p>
+            <p>{this.state.description}</p>
           </div>
           <div>
             <em>
