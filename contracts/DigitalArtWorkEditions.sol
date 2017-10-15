@@ -39,18 +39,15 @@ contract DigitalArtWorkEditions {
     string public title;
 
     /// title is the description of the artwork.
-    /// Need to implement
     string public description;
 
     /// artistName is the artwork's artist name.
     string public artistName;
 
     /// artistKeybase is the artists Keybase.io username
-    /// Need to implement
     string public artistKeybase;
 
-    /// artistDoc is an IPFS file hash of a crypto signed text file (eth address, artist statement)
-    /// Need to implement
+    /// artistDocHash is an IPFS file hash of a crypto signed text file (eth address, artist statement)
     string public artistDocHash;
 
     /// artist is the artwork's artist wallet.
@@ -91,7 +88,8 @@ contract DigitalArtWorkEditions {
     }
 
     /// editions is an array of all the artwork editions.
-    Edition[] public editions;
+    /// getter function automatically created.
+    mapping (uint => Edition) public editions;
 
     /// ownerShare is the percentage the owner of the artwork receives from a sale.
     uint32 private constant ownerShare = 80;
@@ -121,19 +119,25 @@ contract DigitalArtWorkEditions {
     }
 
     function DigitalArtWorkEditions(string _artThumbHash,
-                            string _artHash,
-                            string _title,
-                            string _artistName,
-                            uint _createdYear,
-                            address _artist,
-                            address _withdrawAddress,
-                            uint _numEditions)
+                                    string _artHash,
+                                    string _title,
+                                    string _description,
+                                    string _artistName,
+                                    string _artistKeybase,
+                                    string _artistDocHash,
+                                    uint _createdYear,
+                                    address _artist,
+                                    address _withdrawAddress,
+                                    uint _numEditions)
     public {
 
         if (bytes(_artThumbHash).length == 0) revert();
         if (bytes(_artHash).length == 0) revert();
         if (bytes(_title).length == 0) revert();
+        if (bytes(_description).length == 0) revert();
         if (bytes(_artistName).length == 0) revert();
+        if (bytes(_artistKeybase).length == 0) revert();
+        if (bytes(_artistDocHash).length == 0) revert();
         if (_createdYear == 0) revert();
         if (_artist == address(0)) revert();
         if (_withdrawAddress == address(0)) revert();
@@ -143,7 +147,10 @@ contract DigitalArtWorkEditions {
         artThumbHash = _artThumbHash;
         artHash = _artHash;
         title = _title;
+        description = _description;
         artistName = _artistName;
+        artistKeybase = _artistKeybase;
+        artistDocHash = _artistDocHash;
         createdYear = _createdYear;
         numEditions = _numEditions;
         artistHasSigned = false;
@@ -159,38 +166,11 @@ contract DigitalArtWorkEditions {
 
         // Create all editions
         for(uint i=0; i<numEditions; i++) {
-            editions.push(Edition({
-                owner: _artist,
-                listingPrice: 0,
-                forSaleDate: 0,
-                forSale: false,
-                provenence: Provenence({
-                    owner: artist,
-                    purchaseAmount: 0,
-                    purchaseDate: now
-                })
-            }));
-        }        
-    }
-
-    /// getEditionOwner returns the owner of an edition.
-    function getEditionOwner(uint i) public constant returns (address) {
-        return editions[i].owner;
-    }
-
-    /// getEditionListingPrice returns the listing price of an edition.
-    function getEditionListingPrice(uint i) public constant returns (uint256) {
-        return editions[i].listingPrice;
-    }
-
-    /// getEditionForSaleDate returns the for sale date of an edition.
-    function getEditionForSaleDate(uint i) public constant returns (uint) {
-        return editions[i].forSaleDate;
-    }
-
-    /// getEditionForSale returns whether an edition is for sale.
-    function getEditionForSale(uint i) public constant returns (bool) {
-        return editions[i].forSale;
+            editions[i].owner = _artist;
+            editions[i].listingPrice = 0;
+            editions[i].forSaleDate = 0;
+            editions[i].forSale = false;
+        }
     }
 
     /// If an artwork is for sale, process the purchase.
