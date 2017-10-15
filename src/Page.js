@@ -60,6 +60,7 @@ class App extends Component {
       networkName: '',
       networkId: 0,
       artworkId: props.match.params.id - 1,
+      editionId: 1 - 1,
       numSales: 0,
       provenence: [],
       transactions:[],
@@ -166,6 +167,7 @@ class App extends Component {
           artThumbHash: value[5],
           artHash: value[6],
           numEditions: value[7].toNumber(),
+          artistHasSigned: value[8],
           artworkLoaded: true
         }, () => {
           this.state.instance['getEdition'].call(this.state.artworkId, 0).then((value) => {
@@ -236,11 +238,11 @@ class App extends Component {
 
   sign(evt) {
     evt.preventDefault()
-    this.state.instance.signWork({from: this.state.account}).then((tx) => {
+    this.state.instance.signWork(this.state.artworkId, {from: this.state.account}).then((tx) => {
       const transactions = this.state.transactions.slice()
       transactions.push(tx.tx)
       this.setState({transactions})
-      this.updateState()
+      // this.updateState()
     })
   }
 
@@ -249,28 +251,28 @@ class App extends Component {
     const value = this.state.newListingPrice
     let date = this.state.forSaleDate
     if (date === 0) date = parseInt(new Date().getTime() / 1000, 10) // now
-    this.state.instance.listWorkForSale(value, date, {from: this.state.account}).then((tx) => {
+    this.state.instance.listWorkForSale(this.state.artworkId, this.state.editionId, value, date, {from: this.state.account}).then((tx) => {
       const transactions = this.state.transactions.slice()
       transactions.push(tx.tx)
       this.setState({transactions})
-      this.updateState()
+      // this.updateState()
     })
   }
 
   unlist(evt) {
     evt.preventDefault()
-    this.state.instance.delistWorkForSale({from: this.state.account}).then((tx) => {
+    this.state.instance.delistWorkForSale(this.state.artworkId, this.state.editionId, {from: this.state.account}).then((tx) => {
       const transactions = this.state.transactions.slice()
       transactions.push(tx.tx)
       this.setState({transactions})
-      this.updateState()
+      // this.updateState()
     })
   }
 
   buy(evt) {
     evt.preventDefault()
     const value = this.state.listingPrice
-    this.state.instance.buy({
+    this.state.instance.buy(this.state.artworkId, this.state.editionId, {
       from: this.state.account,
       value
     }).then((tx) => {
