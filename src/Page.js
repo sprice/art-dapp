@@ -3,9 +3,10 @@ import DatePicker from 'react-datepicker'
 import Loader from 'react-loader'
 import moment from 'moment'
 import DigitalArtWork from '../build/contracts/DigitalArtWork.json'
+import ArtGallery from '../build/contracts/ArtGallery.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
-import getContract from './utils/getContract'
+import getArtworkContract from './utils/getArtworkContract'
 import ChromecastButton from './ChromecastButton'
 
 import './css/oswald.css'
@@ -55,14 +56,16 @@ class App extends Component {
       instance: null,
       newWithdrawalAmount: 0,
       contractLoaded: false,
+      artworkLoaded: false,
       networkName: '',
       networkId: 0,
-      pageId: props.match.params.id,
+      artworkId: props.match.params.id - 1,
       numSales: 0,
       provenence: [],
       transactions:[],
       emptyCellMarker: '-',
-      etherscanBase: '//etherscan.io'
+      etherscanBase: '//etherscan.io',
+      numEditions: 0
     }
   }
 
@@ -114,16 +117,16 @@ class App extends Component {
 
   instantiateContract() {
     const contract = require('truffle-contract')
-    const digitalArtWork = contract(DigitalArtWork)
-    digitalArtWork.setProvider(this.state.web3.currentProvider)
+    const artgallery = contract(ArtGallery)
+    artgallery.setProvider(this.state.web3.currentProvider)
 
     
     return new Promise((resolve, reject) => {
       this.state.web3.eth.getAccounts((error, accounts) => {
         if (accounts[0]) this.setState({account: accounts[0]})
-        const contractId = getContract(this.state.networkName, this.state.pageId)
+        const contractId = getArtworkContract(this.state.networkName)
         if (contractId) {
-          digitalArtWork.at(contractId).then((instance) => {
+          artgallery.at(contractId).then((instance) => {
             this.setState({
               instance,
               contractLoaded: true
@@ -149,6 +152,43 @@ class App extends Component {
   }
 
   updateState() {
+    this.state.instance['artworks'].call(this.state.artworkId).then((value) => {
+      // Artwork ID does not exist.
+      if (value[0] === '0x0000000000000000000000000000000000000000'){
+        this.setState({loaded: true})
+      } else {
+        this.setState({
+          artist: value[0],
+          artistName: value[1],
+          title: value[2],
+          description: value[3],
+          createdYear: value[4].toNumber(),
+          artThumbHash: value[5],
+          artHash: value[6],
+          numEditions: value[7].toNumber(),
+          artworkLoaded: true
+        }, () => {
+          this.state.instance['getEdition'].call(this.state.artworkId, 0).then((value) => {
+            this.setState({
+              owner: value[0],
+              listingPrice: value[1].toNumber(),
+              forSaleDate: value[2].toNumber(),
+              forSale: value[3]
+            }, () => {
+              this.state.instance['contractOwner'].call().then((value) => {
+                this.setState({
+                  contractOwner: value,
+                  loaded: true
+                })
+              })
+            })
+          })
+        })
+      }
+    })
+  }
+
+  updateState____() {
     this.setState({contractLoaded: true})
     for (let i = 0; i < DigitalArtWork.abi.length; i++) {
       let instance = DigitalArtWork.abi[i]
@@ -332,6 +372,12 @@ class App extends Component {
     )
   }
 
+  renderNoArtwork() {
+    return (
+      <h1>No artwork with this ID found on the {this.state.networkName} network.</h1>
+    )
+  }
+
   renderArtwork() {
     const isOwner = this.state.account === this.state.owner
     if (!this.state.artThumbHash || !this.state.artHash) return
@@ -371,9 +417,6 @@ class App extends Component {
       forSaleString = `${day} at ${time} in your local timezone.`
     }
 
-    const contractId = getContract(this.state.networkName, this.state.pageId)
-    const contractLink = `${this.state.etherscanBase}/address/${contractId}#code`
-
     return (
         <div>
           {identity && (
@@ -384,9 +427,6 @@ class App extends Component {
           )}
           <h1>{this.state.title}</h1>
           <h2>{this.state.artistName}, {this.state.createdYear}</h2>
-          <p>
-            <a href={contractLink} target="_blank" className="pure-button pure-button-primary button-xsmall">View Contract</a>
-          </p>
           <div className="description">
             <p></p>
           </div>
@@ -497,8 +537,10 @@ class App extends Component {
             <div className="pure-g">
               <div className="pure-u-1-1">
                   {this.state.contractLoaded
-                    ? this.renderContract()
-                    : this.renderNoContract()
+                    ? this.state.artworkLoaded
+                      ? this.renderContract()
+                      : this.renderNoArtwork()
+                    :  this.renderNoContract()
                   }
               </div>
               <div className="pure-u-1-1">
