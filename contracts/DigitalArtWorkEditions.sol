@@ -175,6 +175,7 @@ contract DigitalArtWorkEditions {
 
     /// If an artwork is for sale, process the purchase.
     function buy(uint numEdition) public payable returns (bool) {
+        if (numEdition < 0) revert();
         if (editions[numEdition].forSale != true) revert();
         if (artistHasSigned != true) revert();
         if (msg.value < editions[numEdition].listingPrice) revert();
@@ -218,6 +219,7 @@ contract DigitalArtWorkEditions {
     function listWorkForSale(uint numEdition, uint256 _listingPrice, uint _forSaleDate)
     onlyOwner(numEdition)
     public returns (bool) {
+        if (numEdition < 0) revert();
         if (_listingPrice <= 0) revert();
         if (_forSaleDate <= 0) revert();
         if (artistHasSigned != true) revert();
@@ -233,6 +235,7 @@ contract DigitalArtWorkEditions {
     function delistWorkForSale(uint numEdition) 
     onlyOwner(numEdition)
     public returns (bool) {
+        if (numEdition < 0) revert();
         if (editions[numEdition].forSale != true) revert();
 
         editions[numEdition].forSale = false;
@@ -255,6 +258,7 @@ contract DigitalArtWorkEditions {
 
     /// getSalesNum returns the number of purchases.
     function getSalesNum(uint numEdition) public constant returns (uint) {
+        if (numEdition < 0) revert();
         return editions[numEdition].provenence.length;
     }
 
