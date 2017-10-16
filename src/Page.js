@@ -562,10 +562,16 @@ class App extends Component {
         : <span/>
       }
 
-      {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && (
+      {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && this.state.address && (
         <div>
           <span><a className="pure-button" onClick={this.buy}>Buy</a></span>
           <span>{saleAmount} ETH</span>
+        </div>
+      )}
+
+      {this.state.forSale && (!isArtist || !isOwner) && !forSaleInFuture && !this.state.address && (
+        <div>
+          <p>Please connect to <a href="https://metamask.io/">Metamask</a> or an Ethereum browser to purchase this artwork.</p>
         </div>
       )}
 
