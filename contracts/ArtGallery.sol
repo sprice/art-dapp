@@ -175,57 +175,6 @@ contract ArtGallery {
         numArtworks += 1;
     }
 
-    /// getEdition returns the edition specific artwork details.
-    function getEdition(uint numArtwork, uint numEdition) public constant returns (address, uint256, uint, bool) {
-        if (numArtwork < 0) revert();
-        if (numEdition < 0) revert();
-        return (
-            artworks[numArtwork].editions[numEdition].owner,
-            artworks[numArtwork].editions[numEdition].listingPrice,
-            artworks[numArtwork].editions[numEdition].forSaleDate,
-            artworks[numArtwork].editions[numEdition].forSale
-        );
-    }
-
-    /// getCheapestEditionForSale returns the ediiton for sale for the least amount of all editions.
-    /// Note: Returns the edition number, not the index number.
-    function getCheapestEditionForSale(uint numArtwork) public constant returns (uint, uint256) {
-        if (numArtwork < 0) revert();
-        uint cheapestEdition = 0;
-        uint256 cheapestAmount = 0;
-        bool foundFirst = false;
-        for(uint i=0; i<artworks[numArtwork].numEditions; i++) {
-            if (artworks[numArtwork].editions[i].forSale) {
-                if (!foundFirst) {
-                    cheapestEdition = i;
-                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
-                    foundFirst = true;
-                }
-                if (artworks[numArtwork].editions[i].listingPrice < cheapestAmount) {
-                    cheapestEdition = i;
-                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
-                }
-            }
-        }
-        if (cheapestAmount > 0) {
-            return (cheapestEdition + 1, cheapestAmount);
-        } else {
-            return (0, 0);
-        }
-    }
-
-    /// getProvenence returns the edition specific artwork details.
-    function getProvenence(uint numArtwork, uint numEdition, uint provenenceId) public constant returns (address, uint256, uint) {
-        if (numArtwork < 0) revert();
-        if (numEdition < 0) revert();
-        if (provenenceId < 0) revert();
-        return (
-            artworks[numArtwork].editions[numEdition].provenence[provenenceId].owner,
-            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseAmount,
-            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseDate
-        );
-    }
-
     /// If an artwork is for sale, process the purchase.
     function buy(uint numArtwork, uint numEdition) public payable returns (bool) {
         if (numArtwork < 0) revert();
@@ -318,6 +267,57 @@ contract ArtGallery {
         if (numArtwork < 0) revert();
         if (numEdition < 0) revert();
         return artworks[numArtwork].editions[numEdition].provenence.length;
+    }
+
+    /// getEdition returns the edition specific artwork details.
+    function getEdition(uint numArtwork, uint numEdition) public constant returns (address, uint256, uint, bool) {
+        if (numArtwork < 0) revert();
+        if (numEdition < 0) revert();
+        return (
+            artworks[numArtwork].editions[numEdition].owner,
+            artworks[numArtwork].editions[numEdition].listingPrice,
+            artworks[numArtwork].editions[numEdition].forSaleDate,
+            artworks[numArtwork].editions[numEdition].forSale
+        );
+    }
+
+    /// getCheapestEditionForSale returns the ediiton for sale for the least amount of all editions.
+    /// Note: Returns the edition number, not the index number.
+    function getCheapestEditionForSale(uint numArtwork) public constant returns (uint, uint256) {
+        if (numArtwork < 0) revert();
+        uint cheapestEdition = 0;
+        uint256 cheapestAmount = 0;
+        bool foundFirst = false;
+        for(uint i=0; i<artworks[numArtwork].numEditions; i++) {
+            if (artworks[numArtwork].editions[i].forSale) {
+                if (!foundFirst) {
+                    cheapestEdition = i;
+                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
+                    foundFirst = true;
+                }
+                if (artworks[numArtwork].editions[i].listingPrice < cheapestAmount) {
+                    cheapestEdition = i;
+                    cheapestAmount = artworks[numArtwork].editions[i].listingPrice;
+                }
+            }
+        }
+        if (cheapestAmount > 0) {
+            return (cheapestEdition + 1, cheapestAmount);
+        } else {
+            return (0, 0);
+        }
+    }
+
+    /// getProvenence returns the edition specific artwork details.
+    function getProvenence(uint numArtwork, uint numEdition, uint provenenceId) public constant returns (address, uint256, uint) {
+        if (numArtwork < 0) revert();
+        if (numEdition < 0) revert();
+        if (provenenceId < 0) revert();
+        return (
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].owner,
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseAmount,
+            artworks[numArtwork].editions[numEdition].provenence[provenenceId].purchaseDate
+        );
     }
 
     /// withdraw allows the contract owner to transfer out the contract balance.
