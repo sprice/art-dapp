@@ -12,7 +12,8 @@ module.exports = {
       port: 8545,
       from: "0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E", // Shawn's Metamask Address
       network_id: 4,  // Rinkeby network
-      gas: 4000000 // Gas limit used for deploys
+      gas: 4000000, // Gas limit used for deploys
+      gasPrice: 21000000000
     }
   }
 };
