@@ -166,7 +166,6 @@ class App extends Component {
   }
 
   updateState() {
-    console.log('updateState')
     this.state.instance['artworks'].call(this.state.artworkId).then((value) => {
       // Artwork ID does not exist.
       // state.artworkLoaded is currently false.
