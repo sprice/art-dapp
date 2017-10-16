@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Nav from './Nav'
 import highlights from './utils/getHighlights'
 
 class Highlights extends Component {
@@ -34,14 +35,7 @@ class Highlights extends Component {
       <div>
           <div className="highlights">
             <div className="primary">
-              <nav className="navbar pure-menu pure-menu-horizontal">
-                <div className="">
-                  <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-                </div>
-                <div className="">
-                  <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-                </div>
-              </nav>
+              <Nav />
               <div className="pure-g">
                 <div className="pure-u-1-1">
                   <div className="info">

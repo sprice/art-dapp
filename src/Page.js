@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Nav from './Nav'
 import DatePicker from 'react-datepicker'
 import Loader from 'react-loader'
 import moment from 'moment'
@@ -597,14 +598,7 @@ class App extends Component {
       <Loader loaded={this.state.loaded}>
         <div className="app">
           <div className="primary">
-            <nav className="navbar pure-menu pure-menu-horizontal">
-              <div className="">
-                <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-              </div>
-              <div className="">
-                <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-              </div>
-            </nav>
+            <Nav />
             <div className="pure-g">
               <div className="pure-u-1-1">
                   {this.state.contractLoaded

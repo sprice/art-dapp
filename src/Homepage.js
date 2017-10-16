@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Nav from './Nav'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -32,14 +33,7 @@ class Homepage extends Component {
     return (
       <div className="app">
         <div className="primary">
-          <nav className="navbar pure-menu pure-menu-horizontal">
-            <div className="">
-              <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
-            </div>
-            <div className="">
-              <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
-            </div>
-          </nav>
+          <Nav />
           <div className="pure-g">
             <div className="pure-u-1-1">
               <h1 className="center title">Introducing True Ownership Of Digital Fine Art</h1>
@@ -54,7 +48,6 @@ class Homepage extends Component {
             </div>
             <div className="pure-u-1-1">
               {/*} Begin MailChimp Signup Form */}
-              <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css" />
               <div id="mc_embed_signup">
                 <form action="https://ist.us16.list-manage.com/subscribe/post?u=bdf08ecde40d559699147e198&amp;id=f15e568e31" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" className="validate" target="_blank" noValidate>
                   <div id="mc_embed_signup_scroll">

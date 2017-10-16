@@ -7,6 +7,7 @@ import {
 
 import Homepage from './Homepage'
 import About from './About'
+import Updates from './Updates'
 import Highlights from './Highlights'
 import Page from './Page'
 import NotFound from './NotFound'
@@ -17,6 +18,7 @@ const Routes = () => (
       <Switch>
         <Route exact path="/" component={Homepage}/>
         <Route exact path="/about" component={About}/>
+        <Route exact path="/updates" component={Updates}/>
         <Route exact path="/highlights" component={Highlights}/>
         <Route path="/a/:id/:editionId" component={Page}/>
         <Route path="/a/:id" component={Page}/>
