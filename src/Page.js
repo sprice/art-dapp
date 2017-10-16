@@ -5,7 +5,7 @@ import moment from 'moment'
 import ArtGallery from '../build/contracts/ArtGallery.json'
 import getWeb3 from './utils/getWeb3'
 import getNetwork from './utils/getNetwork'
-import getArtworkContract from './utils/getArtworkContract'
+import getContract from './utils/getContract'
 import ChromecastButton from './ChromecastButton'
 
 import './css/oswald.css'
@@ -137,22 +137,23 @@ class App extends Component {
     return new Promise((resolve, reject) => {
       this.state.web3.eth.getAccounts((error, accounts) => {
         if (accounts[0]) this.setState({account: accounts[0]})
-        const contractId = getArtworkContract(this.state.networkName)
+        const contractId = getContract(this.state.networkName)
         if (contractId) {
-          artgallery.at(contractId).then((instance) => {
-            this.setState({
-              instance,
-              contractLoaded: true
+          artgallery.at(contractId)
+            .then((instance) => {
+              this.setState({
+                instance,
+                contractLoaded: true
+              })
+              this.updateState()
+              return resolve()
+            }).catch((err) => {
+              this.setState({
+                loaded: true,
+                contractLoaded: false
+              })
+              return reject(err)
             })
-            this.updateState()
-            return resolve()
-          }).catch((err) => {
-            this.setState({
-              loaded: true,
-              contractLoaded: false
-            })
-            return reject(err)
-          })
         } else {
           this.setState({
             loaded: true,
@@ -165,6 +166,7 @@ class App extends Component {
   }
 
   updateState() {
+    console.log('updateState')
     this.state.instance['artworks'].call(this.state.artworkId).then((value) => {
       // Artwork ID does not exist.
       // state.artworkLoaded is currently false.
