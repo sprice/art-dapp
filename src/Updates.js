@@ -1,8 +1,6 @@
 import React from 'react'
 import Nav from './Nav'
 
-const contractHref = 'https://rinkeby.etherscan.io/address/0xd275a265038c9ab985bc96a81aaabcceef8f57b9#code'
-
 const Updates = ({ match }) => (
   <div className="app">
     <div className="primary">
