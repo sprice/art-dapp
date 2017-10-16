@@ -436,7 +436,7 @@ class App extends Component {
           }
         </div>
         <div>
-          {!this.state.isEdition && !!this.state.cheapestEdition && (
+          {!this.state.isEdition && !!this.state.cheapestEdition && this.numEditions > 1 &&  (
             this.renderBuyEditionButton()
           )}
         </div>
