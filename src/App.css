@@ -75,11 +75,15 @@ code {
   padding: 45px 20px;
 }
 
+.highlights,
 .app {
   display: flex;
   flex-flow: row wrap;
-  background-color: #F44336;
   align-items: stretch;
+}
+
+.app {
+  background-color: #F44336;
 }
 
 .primary {
@@ -120,7 +124,20 @@ nav, .primary, .secondary {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.framed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.colored-1 {
   background-color: #F44336;
+}
+
+.colored-2 {
+  background-color: #FFEB3B;
 }
 
 @media all and (min-width: 800px) {
@@ -135,7 +152,7 @@ nav, .primary, .secondary {
     height: 100vh;
   }
 
-  .frame-wrap {
+  .frame-wrap.fixed {
     position: fixed;
   }
 }

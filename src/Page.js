@@ -411,7 +411,7 @@ class App extends Component {
     const artwork = this.state.ipfsBase + this.state.artHash
 
     if (isOwner) {
-        return <a href={artwork} target="_blank"><img src={artwork} alt={this.state.title} className="Artwork Original" /></a>
+        return <a href={thumbnail} target="_blank"><img src={artwork} alt={this.state.title} className="Artwork Original" /></a>
     } else {
       return <img src={thumbnail} alt={this.state.title} className="Artwork Thumbnail" />
     }
@@ -616,7 +616,7 @@ class App extends Component {
             </div>
           </div>
           <div className="secondary">
-            <div className="frame-wrap">
+            <div className="frame-wrap fixed">
               {this.state.contractLoaded && this.state.artworkLoaded && (
                 <div className="frame">
                     {this.renderArtwork()}

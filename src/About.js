@@ -22,7 +22,7 @@ const About = ({ match }) => (
       </div>
     </div>
     <div className="secondary">
-      <div className="frame-wrap">
+      <div className="frame-wrap fixed">
         <div className="frame">
             <img className="main-image" src="/img/1.jpg" alt="Pineapple" />
         </div>

@@ -1,0 +1,64 @@
+import React, { Component } from 'react'
+import highlights from './utils/getHighlights'
+
+class Highlights extends Component {
+
+  constructor(props) {
+    super(props)
+
+    this.renderHighlight = this.renderHighlight.bind(this)
+
+    this.state = {
+      highlights: highlights()
+    }
+  }
+
+  renderHighlight(id) {
+    const src = `//ipfs.io/ipfs/${this.state.highlights[id].artThumbHash}`
+    const href = `/a/${id + 1}`
+    return (
+      <div className="frame-wrap">
+        <div className="frame">
+            <a href={href}><img className="main-image" src={src} alt="Artwork" /></a>
+        </div>
+      </div>
+    )
+  }
+
+  render() {
+    return (
+      <div>
+          <div className="highlights">
+            <div className="primary">
+              <nav className="navbar pure-menu pure-menu-horizontal">
+                <div className="">
+                  <a href="/" className="pure-menu-heading pure-menu-link">Chill</a>
+                </div>
+                <div className="">
+                  <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
+                </div>
+              </nav>
+              <div className="pure-g">
+                <div className="pure-u-1-1">
+                  <div className="info">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="secondary colored-1">
+              {this.renderHighlight(0)}
+            </div>
+          </div>
+          <div className="highlights">
+            <div className="primary framed colored-2">
+              {this.renderHighlight(1)}
+            </div>
+            <div className="secondary">
+            </div>      
+          </div>
+        </div>
+    )
+  }
+}
+
+export default Highlights
