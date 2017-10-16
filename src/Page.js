@@ -395,13 +395,13 @@ class App extends Component {
 
   renderNoContract() {
     return (
-      <h1>No artwork found on the {this.state.networkName} network.</h1>
+      <h1>No artwork found on the {this.state.networkName} network. We&rsquo;re testing in Rinkeby.</h1>
     )
   }
 
   renderNoArtwork() {
     return (
-      <h1>No artwork with this ID found on the {this.state.networkName} network.</h1>
+      <h1>No artwork with this ID found on the {this.state.networkName} network. We&rsquo;re testing in Rinkeby.</h1>
     )
   }
 
