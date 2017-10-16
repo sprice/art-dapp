@@ -45,6 +45,10 @@ class Homepage extends Component {
                 <h2>For Artists</h2>
                 <p>The record of ownership, proof of authenticity, and the artwork itself is secured using Blockchain technology. Chill is a platform to easily &amp; securely sell your art to collectors.</p>
               </div>
+              <div className="info">
+                <h2>Beta Testing</h2>
+                <p>Currently beta testing on the Rinkeby Ethereum network.</p>
+              </div>
             </div>
             <div className="pure-u-1-1">
               {/*} Begin MailChimp Signup Form */}
