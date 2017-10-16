@@ -5,10 +5,10 @@ const getContract = (networkName) => {
         contractId = false
         break
     case 'rinkeby':
-        contractId = '0x0a1fa1e2fcab5014cdb9e850280ed404c1a01e1e'
+        contractId = '0xd275a265038c9ab985bc96a81aaabcceef8f57b9'
         break
     case 'unknown':
-        contractId = '0xa1a79a2f67160c3de05bf7b6748a5fad9477a2ae'
+        contractId = ''
         break
     default:
         contractId = false
