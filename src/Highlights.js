@@ -16,11 +16,15 @@ class Highlights extends Component {
   renderHighlight(id) {
     const src = `//ipfs.io/ipfs/${this.state.highlights[id].artThumbHash}`
     const href = `/a/${id + 1}`
+    const text = this.state.highlights[id].text
     return (
-      <div className="frame-wrap">
-        <div className="frame">
-            <a href={href}><img className="main-image" src={src} alt="Artwork" /></a>
+      <div>
+        <div className="frame-wrap">
+          <div className="frame">
+              <a href={href}><img className="main-image" src={src} alt="Artwork" /></a>
+          </div>
         </div>
+        <p className="center"><em>{text}</em></p>
       </div>
     )
   }
