@@ -9,6 +9,9 @@ const Nav = ({ match }) => (
       <a href="/about" className="pure-menu-heading pure-menu-link">About</a>
     </div>
     <div>
+      <a href="/highlights" className="pure-menu-heading pure-menu-link">Highlights</a>
+    </div>
+    <div>
       <a href="/updates" className="pure-menu-heading pure-menu-link">Updates</a>
     </div>
   </nav>
