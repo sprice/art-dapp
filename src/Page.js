@@ -286,6 +286,8 @@ class App extends Component {
       transactions.push(tx.tx)
       this.setState({transactions})
       this.updateState()
+    }).catch((err) => {
+      throw new Error(err)
     })
   }
 
