@@ -7,6 +7,9 @@ Based on http://truffleframework.com/boxes/react
 // Get started
 $ npm install
 
+// Run build server
+$ npm run build
+
 // Run dev server
 $ npm run start
 

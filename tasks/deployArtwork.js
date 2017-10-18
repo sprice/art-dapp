@@ -5,19 +5,25 @@ const Web3 = require('web3')
 const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"))
 
 // Address deploying from
-web3.eth.defaultAccount = '0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E';
+
+// Rinkeby
+//web3.eth.defaultAccount = '0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E';
+
+// Ropsten
+web3.eth.defaultAccount = '0xe407c9d148add4df42f8b4bcaa7e789d2dc4ebcb';
 
 // Rinkeby
 // const contractAddress = '0xd275a265038c9ab985bc96a81aaabcceef8f57b9'
 
-const contractAddress = '0xd275a265038c9ab985bc96a81aaabcceef8f57b9'
+// Ropsten
+const contractAddress = '0x2b9bed46f010720174c3394c55a19d4e48aebd4f'
 
 const abiArray = JSON.parse(fs.readFileSync(path.join(__dirname, '../build/contracts/ArtGallery.json'), 'utf8'))
 const instance = web3.eth.contract(abiArray.abi).at(contractAddress);
 
 instance.createArtwork(
-    '0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E',
-    'Shawn Price',
+    '0xe407c9d148add4df42f8b4bcaa7e789d2dc4ebcb',
+    'Dave Cheung',
     'Autumn',
     'Leaves in the trees.',
     2017,
@@ -35,8 +41,8 @@ instance.createArtwork(
     })
 
 // instance.createArtwork(
-//     '0xf5136F6a8C2c8C559FD1468d81a3f7DC9d2dC26E',
-//     'Shawn Price',
+//     '0xe407c9d148add4df42f8b4bcaa7e789d2dc4ebcb',
+//     'Dave Cheung',
 //     'Forest',
 //     'Light through the trees.',
 //     2017,

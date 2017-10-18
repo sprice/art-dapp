@@ -14,7 +14,7 @@ server.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname,'/build_webpack/index.html'))
 })
 
-const port = process.env.PORT
+const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log('server listening on port ' + port)
 })

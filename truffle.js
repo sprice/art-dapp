@@ -14,6 +14,12 @@ module.exports = {
       network_id: 4,  // Rinkeby network
       gas: 4000000, // Gas limit used for deploys
       gasPrice: 21000000000
-    }
+    },
+    ropsten: {
+      host: "localhost",
+      from: "0xe407c9d148add4df42f8b4bcaa7e789d2dc4ebcb", // Dave's Metamask Address
+      port: 8545,
+      network_id: 3, // Ropsten network
+    },
   }
 };
